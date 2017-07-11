@@ -7,4 +7,5 @@ let config = {
     projectId: "bantul-cmap",
 }
 
-export default firebase.initializeApp(config)
+firebase.initializeApp(config)
+export default firebase

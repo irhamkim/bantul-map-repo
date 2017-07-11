@@ -9,17 +9,7 @@ let store = new Vuex.Store({
 	},
 	getters: {
 		userDisplayName: function(state) {
-			if (state.user) {
-				var providerData = state.user.providerData[0];
 			
-				if (providerData.providerId !== 'password') {
-					return providerData.displayName;
-				} else {
-					return state.user.displayName;
-				}
-			} else {
-				return null;
-			}
 		}
 	},
 	mutations: {
