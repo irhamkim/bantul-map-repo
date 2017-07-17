@@ -8,11 +8,13 @@
 			<div v-if="!isLoggedIn">
 				<button @click="openLoginForm">Login</button>
 			</div>
-			<div v-else>
+			<div v-if="isLoggedIn && !currentUserReviewed">
 				<button @click="openReviewForm">Add Review</button>
 			</div>
-			<div>
-				uwu. //edit review here
+			<div v-if="currentUserReviewed">
+				{{ userReview.content }}
+				<button @click="openReviewForm">Edit</button>
+				<button @click="deleteReview">Delete</button>
 			</div>
 			<li v-for="(review, index) in reviews" :key="index">
 				<span>{{ review.submittedBy }}</span>
@@ -25,8 +27,15 @@
 
 <script>
 import firebase from '../firebaseApp'
+import * as moment from 'moment'
+
 	export default {
 		name: 'infoTab',
+		beforeMount() {
+			if (this.$store.state.user) {
+				this.$bindAsObject('userReview', firebase.database().ref('users').child(this.$store.state.user.uid).child('reviews').child(this.$route.query.location))
+			}
+		},
 		data() {
 			return {
 				locationReviews: []
@@ -53,10 +62,27 @@ import firebase from '../firebaseApp'
 				return this.$store.state.user ? true : false
 			},
 			currentUserReviewed() {
-				return this.locationReviews[this.$store.state.user.uid] ? true : false
+				if (this.$store.state.user) {
+					let val
+					this.$firebaseRefs.locationReviews.on('value', (snapshot) => {
+						if (snapshot.hasChild(this.$store.state.user.uid)) {
+							val = true
+						} else {
+							val = false
+						}
+					})
+
+					return val
+				} else {
+					return false
+				}
+
 			}
 		},
 		methods: {
+			submitTime(time) {
+				return moment(time).calendar()
+			},
 			closeInfoTab() {
 				this.$emit('close-info-tab')
 			},
@@ -66,8 +92,9 @@ import firebase from '../firebaseApp'
 			openLoginForm() {
 				this.$emit('open-login-form')
 			},
-			submitTime(time) {
-				return new Date(time)
+			deleteReview() {
+				this.$firebaseRefs.userReview.remove()
+				this.$firebaseRefs.locationReviews.child(this.$store.state.user.uid).remove()
 			}
 		}
 	}

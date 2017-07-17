@@ -3,13 +3,18 @@
 		<floating-menu
 			@search-location="searchLocation(payload)"
 			@open-login-form="openLoginForm"
-			@open-register-form="openRegisterForm">
+			@open-register-form="openRegisterForm"
+			@open-search-result="openSearchResult"
+			@close-search-result="closeSearchResult">
 		</floating-menu>
 		<info-tab v-if="infoTabOpen"
 			@close-info-tab="closeInfoTab"
 			@open-login-form="openLoginForm"
 			@open-review-form="openReviewForm">
 		</info-tab>
+		<search-result v-if="searchResultOpen"
+			@close-search-result="closeSearchResult">
+		</search-result>
 		<login-form v-if="loginFormOpen"
 			@close-login-form="closeLoginForm">
 		</login-form>
@@ -42,7 +47,7 @@
 		<button class="map__circle-button"
 			@click="panToUser">get position
 		</button>
-		<gmap-map ref="locationMap" :center="initialCenter" :zoom="15" 
+		<gmap-map ref="locationMap" :center="initialCenter" :zoom="18" 
 			:options="options" :style="styles">
 			<gmap-marker v-if="currentPosition" :position="currentPosition"
 				@click="panTo(currentPosition)"></gmap-marker>
@@ -58,6 +63,7 @@ import FloatingMenu from './FloatingMenu'
 import InfoTab from './InfoTab'
 import LoginForm from './LoginForm'
 import ReviewForm from './ReviewForm'
+import SearchResult from './SearchResult'
 import Vue from 'vue'
 import * as VueGoogleMaps from 'vue2-google-maps'
 import firebase from '../firebaseApp'
@@ -79,12 +85,21 @@ export default {
 						lat: position.lat,
 						lng: position.lng
 					}
+					this.infoTabOpen = true;
 				}
 			})
 		}
 		firebase.auth().onAuthStateChanged((user) => {
 			if (user) {
 				this.$store.commit('setUserState', user)
+				firebase.database().ref('users').on('value', (snapshot) => {
+					if (!snapshot.hasChild(this.$store.state.user.uid)) {
+						
+						firebase.database().ref('users').child(this.$store.state.user.uid).set({
+							i: 1
+						})
+					}
+				})
 			}
 		})
 	},
@@ -109,7 +124,8 @@ export default {
 			errorMessage: null,
 			infoTabOpen: false,
 			reviewFormOpen: false,
-			loginFormOpen: false
+			loginFormOpen: false,
+			searchResultOpen: false,
 		}
 	},
 	firebase() {
@@ -121,7 +137,8 @@ export default {
 		FloatingMenu,
 		InfoTab,
 		LoginForm,
-		ReviewForm
+		ReviewForm,
+		SearchResult
 	},
 	methods: {
 		allowGeolocation() {
@@ -175,8 +192,8 @@ export default {
 			}
 		},
 		openInfoTab(key) {
-			this.infoTabOpen = true
 			this.$router.push({ query: { location: key } })
+			this.infoTabOpen = true
 		},
 		closeInfoTab() {
 			this.errorMessage = null
@@ -198,6 +215,12 @@ export default {
 		},
 		openRegisterForm() {
 			this.reviewFormOpen = true
+		},
+		openSearchResult() {
+			this.searchResultOpen = true
+		},
+		closeSearchResult() {
+			this.searchResultOpen = false
 		}
 	},
 	watch: {
@@ -221,6 +244,7 @@ export default {
 	&__popup-message {
 		background-color: white;
 		display: inline-block;
+		font-family: Roboto, Helvetica;
 		padding: 15px;
 		position: absolute;
 		top: 50%;
@@ -232,12 +256,10 @@ export default {
 		z-index: 1;
 		&__head {
 			color: blue;
-			font-family: Roboto, Helvetica;
 			font-size: 17px;
 			font-weight: 500;
 		}
 		&__note {
-			font-family: Roboto, Helvetica;
 			font-size: 9px;
 		}
 		&__button {

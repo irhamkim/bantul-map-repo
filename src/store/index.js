@@ -6,6 +6,7 @@ Vue.use(Vuex)
 let store = new Vuex.Store({
 	state: {
 		user: null,
+		keyword: null
 	},
 	getters: {
 		userDisplayName: function(state) {
@@ -18,6 +19,9 @@ let store = new Vuex.Store({
 		},
 		removeUserState: function(state) {
 			state.user = null;
+		},
+		searchLocation(state, keyword) {
+			state.keyword = keyword
 		}
 	},
 	actions: {
