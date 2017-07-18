@@ -1,25 +1,17 @@
 <template>
 	<div class="floating-menu">
-		<div class="floating-menu__search-form">
-			<input class="floating-menu__search-input" type="text" placeholder="Search location"
-				v-model="searchKeyword"
-				@keyup.enter="searchLocation">
-			<button class="floating-menu__search-button"
-				@click="searchLocation">Search</button>
-		</div>
-		<div v-if="!isLoggedIn"
-			class="floating-menu__user-section">			
-			<button class="floating-menu__flat-button floating-menu__flat-button--first"
-				@click="openLoginForm">Login</button>
-		</div>
-		<div v-else
-			class="floating-menu__user-section">
-			<div class="floating-menu__display-name">
-				<span>{{ userDisplayName }}</span>
-			</div>
-			<button class="floating-menu__flat-button floating-menu__flat-button--second" 
-				@click="logOutUser">Log Out</button>
-		</div>
+		<input class="floating-menu__search-input" type="text" placeholder="Search location"
+			v-model="searchKeyword"
+			@keyup.enter="searchLocation"
+			@keyup.esc="closeSearchResult">
+		<button class="floating-menu__flat-button"
+			@click="searchLocation">Search</button>		
+		<button v-if="isLoggedIn && !infoWindowOpen" class="floating-menu__flat-button"
+			@click="openUserMenu">{{ userDisplayName }}</button>
+		<button v-if="isLoggedIn && infoWindowOpen" class="floating-menu__flat-button"
+			@click="closeInfoWindow">Close</button>
+		<button v-if="!isLoggedIn" class="floating-menu__flat-button"
+			@click="openLoginForm">Login</button>
 	</div>
 </template>
 
@@ -30,7 +22,7 @@ export default {
 	name: 'floatingMenu',
 	data() {
 		return {
-			searchKeyword: null
+			searchKeyword: null,
 		}
 	},
 	computed: {
@@ -42,7 +34,10 @@ export default {
 
 			let strSub = str.substr(0, str.indexOf(' ') ? str.indexOf(' ') : str.length())
 
-			return strSub.length < 9 ? strSub : strSub.substr(0, 6) + '..'
+			return strSub.length < 6 ? strSub : strSub.substr(0, 6) + '..'
+		},
+		infoWindowOpen() {
+			return this.$store.state.infoWindowOpen ? true : false
 		}
 	},
 	methods: {
@@ -63,7 +58,21 @@ export default {
 			}).catch((error) => {
 
 			})
-		}
+		},
+		openUserMenu() {
+			this.$emit('open-user-menu')
+		},
+		closeUserMenu() {
+			this.$emit('close-user-menu')
+		},
+		closeSearchResult() {
+			this.searchKeyword = null
+			this.$emit('close-search-result')
+		},
+		closeInfoWindow() {
+			this.$emit('close-info-window')
+			this.$store.commit('closeInfoWindow')
+		},
 	}
 
 }
@@ -72,20 +81,21 @@ export default {
 	
 <style lang="scss">
 	.floating-menu {
-		background-color: teal;
-		display: flex;
+		background-color: white;
+		border-radius: 5px;
+		-webkit-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
+		-moz-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
+		box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 		position: absolute;
-		top: 0;
-		left: 0;
-		width: 500px;
+		top: 5px;
+		left: 5px;
+		width: 420px;
 		height: 40px;
-		z-index: 1;
-		&__search-form {
-			flex: 1 1 66%;
-		}
+		z-index: 2;
 		&__search-input {
 			box-sizing: border-box;
 			border: none;
+			color: rgba(0, 0, 0, 0.5);
 			font-family: Roboto, Helvetica;
 			font-size: 17px;
 			padding-left: 5px;
@@ -96,52 +106,16 @@ export default {
 				outline-style: none;
 			}
 		}
-		&__search-button {
-			background-color: white;
+		&__flat-button {
+			background-color: #00b27c;
 			border: none;
+			color: white;
 			font-family: Roboto, Helvetica;
 			font-size: 17px;
 			width: 70px;
 			height: 30px;
 			&:active, &:focus {
 				outline-style: none;
-			}
-		}
-		&__user-section {
-			display: flex;
-			flex: 1 1 30%;
-			position: relative;
-		}
-		&__display-name {
-			color: white;
-			flex: 1 1 50%;
-			font-family: Roboto, Helvetica;
-			font-size: 17px;
-			position: relative;
-			span {
-				position: absolute;
-				top: 50%;
-				left: 50%;
-				transform: translate(-50%, -50%);
-			}
-		}
-		&__flat-button {
-			background-color: teal;
-			border: none;
-			color: white;
-			font-family: Roboto, Helvetica;
-			font-size: 17px;
-			&:active, &:focus {
-				outline-style: none;
-			}
-			&--first {
-				position: absolute;
-				top: 50%;
-				left: 50%;
-				transform: translate(-50%, -50%);
-			}
-			&--second {
-				flex: 1 1 50%;
 			}
 		}
 	}

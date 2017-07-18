@@ -1,17 +1,18 @@
 <template>
 	<div class="map">
 		<floating-menu
-			@search-location="searchLocation(payload)"
 			@open-login-form="openLoginForm"
 			@open-register-form="openRegisterForm"
 			@open-search-result="openSearchResult"
-			@close-search-result="closeSearchResult">
+			@close-search-result="closeSearchResult"
+			@open-user-menu="openUserMenu"
+			@close-user-menu="closeUserMenu"
+			@close-info-window="closeInfoWindow">
 		</floating-menu>
-		<info-tab v-if="infoTabOpen"
-			@close-info-tab="closeInfoTab"
+		<info-window v-if="infoWindowOpen"
 			@open-login-form="openLoginForm"
 			@open-review-form="openReviewForm">
-		</info-tab>
+		</info-window>
 		<search-result v-if="searchResultOpen"
 			@close-search-result="closeSearchResult">
 		</search-result>
@@ -34,7 +35,7 @@
 				<button @click="allowGeolocation" class="map__popup-message__button map__popup-message__button--right">OK</button>
 			</template>
 			<template v-if="isLoading">
-				Loading...
+				<span class="map__popup-message__loading">Loading...</span>
 			</template>
 			<template v-if="errorMessage">
 				<span class="map__popup-message__head">
@@ -53,14 +54,14 @@
 				@click="panTo(currentPosition)"></gmap-marker>
 			<gmap-marker v-for="(location, index) in locations" :location="location" :key="index"
 				:position="location.position"
-				@click="openInfoTab(location['.key']), panTo(location.position)"></gmap-marker>
+				@click="openInfoWindow(location['.key']), panTo(location.position)"></gmap-marker>
 		</gmap-map>
 	</div>
 </template>
 
 <script>
 import FloatingMenu from './FloatingMenu'
-import InfoTab from './InfoTab'
+import InfoWindow from './InfoWindow'
 import LoginForm from './LoginForm'
 import ReviewForm from './ReviewForm'
 import SearchResult from './SearchResult'
@@ -85,7 +86,8 @@ export default {
 						lat: position.lat,
 						lng: position.lng
 					}
-					this.infoTabOpen = true;
+					this.infoWindowOpen = true;
+					this.$store.commit('openInfoWindow')
 				}
 			})
 		}
@@ -122,7 +124,7 @@ export default {
 			currentPosition: null,
 			isLoading: false,
 			errorMessage: null,
-			infoTabOpen: false,
+			infoWindowOpen: false,
 			reviewFormOpen: false,
 			loginFormOpen: false,
 			searchResultOpen: false,
@@ -135,7 +137,7 @@ export default {
 	},
 	components: {
 		FloatingMenu,
-		InfoTab,
+		InfoWindow,
 		LoginForm,
 		ReviewForm,
 		SearchResult
@@ -191,14 +193,15 @@ export default {
 				this.popUpMessageOpen = true
 			}
 		},
-		openInfoTab(key) {
+		openInfoWindow(key) {
 			this.$router.push({ query: { location: key } })
-			this.infoTabOpen = true
+			this.infoWindowOpen = true
+			this.$store.commit('openInfoWindow')
 		},
-		closeInfoTab() {
-			this.errorMessage = null
-			this.infoTabOpen = false
+		closeInfoWindow() {
+			this.infoWindowOpen = false
 			this.$router.push({ query: '' })
+			this.$store.commit('closeInfoWindow')
 		},
 		openReviewForm() {
 			this.reviewFormOpen = true
@@ -206,7 +209,6 @@ export default {
 		closeReviewForm() {
 			this.reviewFormOpen = false
 		},
-		searchLocation(payload) {},
 		openLoginForm() {
 			this.loginFormOpen = true
 		},
@@ -221,12 +223,28 @@ export default {
 		},
 		closeSearchResult() {
 			this.searchResultOpen = false
+		},
+		openUserMenu() {
+			this.userMenuOpen = true
+		},
+		closeUserMenu() {
+			this.userMenuOpen = false
 		}
 	},
 	watch: {
 		'$route' (to, from) {
 			if (to.query.location) {
-				
+				firebase.database().ref('locations').on('value', (snapshot) => {
+					if (snapshot.hasChild(this.$route.query.location)) {
+						let position = snapshot.child(this.$route.query.location).child('position').val()
+						this.initialCenter = {
+							lat: position.lat,
+							lng: position.lng
+						}
+						this.infoWindowOpen = true;
+						this.$store.commit('openInfoWindow')
+					}
+				})
 			} else {
 				
 			}
@@ -243,8 +261,13 @@ export default {
 	position: absolute;
 	&__popup-message {
 		background-color: white;
+		border-radius: 5px;
+		-webkit-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
+		-moz-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
+		box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 		display: inline-block;
 		font-family: Roboto, Helvetica;
+		font-size: 17px;
 		padding: 15px;
 		position: absolute;
 		top: 50%;
@@ -268,7 +291,6 @@ export default {
 			color: blue;
 			font-family: Roboto, Helvetica;
 			font-size: 17px;
-			font-weight: 500;
 			bottom: 15px;
 			&--left {
 				position: absolute;
@@ -278,6 +300,14 @@ export default {
 				position: absolute;
 				right: 15px
 			}
+		}
+		&__loading {
+			font-family: Roboto, Helvetica;
+			font-size: 17px;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
 		}
 	}
 	&__circle-button {

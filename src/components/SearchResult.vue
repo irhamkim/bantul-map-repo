@@ -58,15 +58,15 @@ import firebase from '../firebaseApp'
 	}
 </script>
 
-<style>
-	.search-result {
-		background-color: white;
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: 400px;
-		height: 300px;
-		z-index: 2;
-	}
+<style lang="scss">
+.search-result {
+	background-color: white;
+	margin-left: 0;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 430px;
+	height: 100%;
+	z-index: 1;
+}
 </style>

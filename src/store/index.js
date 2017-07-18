@@ -6,7 +6,8 @@ Vue.use(Vuex)
 let store = new Vuex.Store({
 	state: {
 		user: null,
-		keyword: null
+		keyword: null,
+		infoWindowOpen: false
 	},
 	getters: {
 		userDisplayName: function(state) {
@@ -22,6 +23,12 @@ let store = new Vuex.Store({
 		},
 		searchLocation(state, keyword) {
 			state.keyword = keyword
+		},
+		openInfoWindow(state) {
+			state.infoWindowOpen = true
+		},
+		closeInfoWindow(state) {
+			state.infoWindowOpen = false
 		}
 	},
 	actions: {

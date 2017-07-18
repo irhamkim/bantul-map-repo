@@ -80,9 +80,12 @@ export default {
 
 </script>
 
-<style>
+<style lang="scss">
 	.review-form {
 		background-color: white;
+		-webkit-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
+		-moz-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
+		box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 		position: absolute;
 		top: 50%;
 		left: 50%;

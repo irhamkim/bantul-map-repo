@@ -84,6 +84,9 @@
 <style lang="scss">
 	.login-form {
 		background-color: white;
+		-webkit-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
+		-moz-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
+		box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 		font-family: Roboto, Helvetica;
 		font-size: 17px;
 		padding: 15px;
