@@ -24,17 +24,17 @@
 			</div>
 			<div v-if="currentUserReviewed"
 				class="info-tab__reviews__section">
-				{{ userReview.content }}
+				<span class="info-tab__reviews__user-review">{{ userReview.content }}</span>
 				<button class="info-tab__button info-tab__button--edit"
 					@click="openReviewForm">Edit</button>
 				<button class="info-tab__button info-tab__button--delete"
 					@click="deleteReview">Delete</button>
 			</div>
 			<div v-for="(review, index) in orderedReviews" :key="index"
-				class="">
-				<span>{{ review.submittedBy }}</span>
-				<span>{{ review.content }}</span>
-				<span>{{ submitTime(review.submitTime) }}</span>
+				class="info-tab__review-item">
+				<span class="info-tab__review-item__user">{{ review.submittedBy }}</span>
+				<span class="info-tab__review-item__content">{{ review.content }}</span>
+				<span class="info-tab__review-item__time">{{ submitTime(review.submitTime) }}</span>
 			</div>
 		</div>
 	</div>
@@ -69,9 +69,11 @@ export default {
 		},
 		computed: {
 			orderedReviews() {
-				return this.locationReviews.sort((a, b) => {
+				let arr = this.locationReviews.sort((a, b) => {
 					return b.submitTime - a.submitTime
 				})
+
+				return arr.slice(0,2)
 			},
 			isLoggedIn() {
 				return this.$store.state.user ? true : false
@@ -134,7 +136,7 @@ export default {
 	z-index: 1;
 	&__head {
 		width: 100%;
-		height: 340px;
+		height: 300px;
 		&__section {
 			background-color: #00b27c;
 			width: 100%;
@@ -146,7 +148,7 @@ export default {
 		}
 		&__image {
 			width: 100%;
-			height: 240px;
+			height: 200px;
 		}
 		&__title {
 			color: white;
@@ -158,11 +160,28 @@ export default {
 	}
 	&__reviews {
 		width: 100%;
-		height: calc(100% - 340px);
+		height: calc(100% - 300px);
 		&__section {
+			border-bottom: 3px solid #00b27c;
 			position: relative;
 			width: 100%;
-			height: 120px;
+			height: 130px;
+			&::after {
+				content: 'Reviews';
+				@include font-default(#00b27c, 20px);
+				position: absolute;
+				bottom: 0px;
+				left: 10px;
+			}
+		}
+		&__user-review {
+			@include font-default(#00b27c, 15px)
+			position: absolute;
+			top: 20%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 250px;
+			text-align: justify;
 		}
 	}
 	&__button {
@@ -183,7 +202,51 @@ export default {
 			height: 50px;
 		}
 		&--login {
-			@extend .info-tab__button--write;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 70px;
+			height: 30px;
+		}
+		&--edit {
+			position: absolute;
+			top: 70%;
+			left: 40%;
+			transform: translate(-50%, -50%);
+			width: 50px;
+			height: 30px;
+		}
+		&--delete {
+			position: absolute;
+			top: 70%;
+			left: 60%;
+			transform: translate(-50%, -50%);
+			width: 70px;
+			height: 30px;
+		}
+	}
+	&__review-item {
+		border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+		position: relative;
+		width: 100%;
+		height: 90px;
+		&__user {
+			@include font-default(black, 15px);
+			position: absolute;
+			top: 5px;
+			left: 10px;
+		}
+		&__content {
+			position: absolute;
+			top: 22px;
+			left: 10px;
+		}
+		&__time {
+			@include font-default(#00b27c, 9px);
+			position: absolute;
+			right: 10px;
+			bottom: 5px;
 		}
 	}
 }

@@ -22,29 +22,32 @@
 		<review-form v-if="reviewFormOpen"
 			@close-review-form="closeReviewForm">
 		</review-form>
-		<div v-if="popUpMessageOpen" class="map__popup-message">
-			<template v-if="!errorMessage && !isLoading">
-				<span class="map__popup-message__head">
-					Allow us to use geolocation to determine your current location?
-					Geolocation is needed to use most of our features.
-				</span><br>
-				<span class="map__popup-message__note">
-					*We do not store any sensitive information.
-				</span><br>
-				<button @click="denyGeolocation" class="map__popup-message__button map__popup-message__button--left">Cancel</button>
-				<button @click="allowGeolocation" class="map__popup-message__button map__popup-message__button--right">OK</button>
-			</template>
-			<template v-if="isLoading">
-				<span class="map__popup-message__loading">Loading...</span>
-			</template>
-			<template v-if="errorMessage">
-				<span class="map__popup-message__head">
-					{{ errorMessage }}
-				</span>
-				<button @click="denyGeolocation" class="map__popup-message__button map__popup-message__button--left">Cancel</button>
-				<button @click="allowGeolocation" class="map__popup-message__button map__popup-message__button--right">Retry</button>
-			</template>
-		</div>
+		<template v-if="popUpMessageOpen">
+			<div class="map__popup-message">
+				<template v-if="!errorMessage && !isLoading">
+					<span class="map__popup-message__head">
+						Allow us to use geolocation to determine your current location?
+						Geolocation is needed to use most of our features.
+					</span><br>
+					<span class="map__popup-message__note">
+						*We do not store any sensitive information.
+					</span><br>
+					<button @click="denyGeolocation" class="map__popup-message__button map__popup-message__button--left">Cancel</button>
+					<button @click="allowGeolocation" class="map__popup-message__button map__popup-message__button--right">OK</button>
+				</template>
+				<template v-if="isLoading">
+					<span class="map__popup-message__loading">Loading...</span>
+				</template>
+				<template v-if="errorMessage">
+					<span class="map__popup-message__head">
+						{{ errorMessage }}
+					</span>
+					<button @click="denyGeolocation" class="map__popup-message__button map__popup-message__button--left">Cancel</button>
+					<button @click="allowGeolocation" class="map__popup-message__button map__popup-message__button--right">Retry</button>
+				</template>
+			</div>
+			<div class="map__modal"></div>
+		</template>
 		<button class="map__circle-button"
 			@click="panToUser">get position
 		</button>
@@ -230,30 +233,22 @@ export default {
 		closeUserMenu() {
 			this.userMenuOpen = false
 		}
-	},
-	watch: {
-		'$route' (to, from) {
-			if (to.query.location) {
-				firebase.database().ref('locations').on('value', (snapshot) => {
-					if (snapshot.hasChild(this.$route.query.location)) {
-						let position = snapshot.child(this.$route.query.location).child('position').val()
-						this.initialCenter = {
-							lat: position.lat,
-							lng: position.lng
-						}
-						this.infoWindowOpen = true;
-						this.$store.commit('openInfoWindow')
-					}
-				})
-			} else {
-				
-			}
-		}
 	}
 }
 </script>
 
 <style lang="scss">
+@mixin box-shadow {
+	-webkit-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
+	-moz-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
+	box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
+}
+@mixin font-default($color, $size) {
+	color: $color;
+	font-family: Roboto, Helvetica;
+	font-size: $size;
+}
+
 .map {
 	display: flex;
 	width: 100%;
@@ -262,12 +257,7 @@ export default {
 	&__popup-message {
 		background-color: white;
 		border-radius: 5px;
-		-webkit-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
-		-moz-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
-		box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 		display: inline-block;
-		font-family: Roboto, Helvetica;
-		font-size: 17px;
 		padding: 15px;
 		position: absolute;
 		top: 50%;
@@ -276,21 +266,17 @@ export default {
 		transform: translate(-50%, -50%);
 		width: 300px;
 		height: 210px;
-		z-index: 1;
+		z-index: 4;
 		&__head {
-			color: blue;
-			font-size: 17px;
-			font-weight: 500;
+			@include font-default(black, 17px);
 		}
 		&__note {
-			font-size: 9px;
+			@include font-default(black, 9px);
 		}
 		&__button {
 			background-color: white;
 			border: none;
-			color: blue;
-			font-family: Roboto, Helvetica;
-			font-size: 17px;
+			@include font-default(#00b27c, 17px);
 			bottom: 15px;
 			&--left {
 				position: absolute;
@@ -302,18 +288,25 @@ export default {
 			}
 		}
 		&__loading {
-			font-family: Roboto, Helvetica;
-			font-size: 17px;
+			@include font-default(black, 17px);
 			position: absolute;
 			top: 50%;
 			left: 50%;
 			transform: translate(-50%, -50%);
 		}
 	}
+	&__modal {
+		background-color: rgba(0, 0, 0, 0.7);
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		z-index: 3;
+	}
 	&__circle-button {
 		background-color: white;
 		border: none;
 		border-radius: 50%;
+		@include font-default(black, 9px);
 		position: absolute;
 		right: 15px;
 		bottom: 15px;

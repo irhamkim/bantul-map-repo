@@ -6,9 +6,9 @@
 			@keyup.esc="closeSearchResult">
 		<button class="floating-menu__flat-button"
 			@click="searchLocation">Search</button>		
-		<button v-if="isLoggedIn && !infoWindowOpen" class="floating-menu__flat-button"
+		<button v-if="isLoggedIn && !infoWindowOpen" class="floating-menu__button"
 			@click="openUserMenu">{{ userDisplayName }}</button>
-		<button v-if="isLoggedIn && infoWindowOpen" class="floating-menu__flat-button"
+		<button v-if="isLoggedIn && infoWindowOpen" class="floating-menu__button"
 			@click="closeInfoWindow">Close</button>
 		<button v-if="!isLoggedIn" class="floating-menu__flat-button"
 			@click="openLoginForm">Login</button>
@@ -99,17 +99,36 @@ export default {
 			font-family: Roboto, Helvetica;
 			font-size: 17px;
 			padding-left: 5px;
+			position: relative;
 			width: 260px;
 			height: 30px;
 			margin: 5px 0 5px 5px;
 			&:active, &:focus {
 				outline-style: none;
 			}
+			&::after {
+				border-right: 2px solid black;
+				content: '';
+				position: absolute;
+				left: 0;
+			}
 		}
-		&__flat-button {
+		&__button {
 			background-color: #00b27c;
 			border: none;
 			color: white;
+			font-family: Roboto, Helvetica;
+			font-size: 17px;
+			width: 70px;
+			height: 30px;
+			&:active, &:focus {
+				outline-style: none;
+			}
+		}
+		&__flat-button {
+			background-color: white;
+			border: none;
+			color: rgba(0, 0, 0, 0.5);
 			font-family: Roboto, Helvetica;
 			font-size: 17px;
 			width: 70px;
