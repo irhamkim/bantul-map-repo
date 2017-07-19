@@ -11,7 +11,8 @@
 		</floating-menu>
 		<info-window v-if="infoWindowOpen"
 			@open-login-form="openLoginForm"
-			@open-review-form="openReviewForm">
+			@open-review-form="openReviewForm"
+			@open-review-window="openReviewWindow">
 		</info-window>
 		<search-result v-if="searchResultOpen"
 			@close-search-result="closeSearchResult">
@@ -22,32 +23,29 @@
 		<review-form v-if="reviewFormOpen"
 			@close-review-form="closeReviewForm">
 		</review-form>
-		<template v-if="popUpMessageOpen">
-			<div class="map__popup-message">
-				<template v-if="!errorMessage && !isLoading">
-					<span class="map__popup-message__head">
-						Allow us to use geolocation to determine your current location?
-						Geolocation is needed to use most of our features.
-					</span><br>
-					<span class="map__popup-message__note">
-						*We do not store any sensitive information.
-					</span><br>
-					<button @click="denyGeolocation" class="map__popup-message__button map__popup-message__button--left">Cancel</button>
-					<button @click="allowGeolocation" class="map__popup-message__button map__popup-message__button--right">OK</button>
-				</template>
-				<template v-if="isLoading">
-					<span class="map__popup-message__loading">Loading...</span>
-				</template>
-				<template v-if="errorMessage">
-					<span class="map__popup-message__head">
-						{{ errorMessage }}
-					</span>
-					<button @click="denyGeolocation" class="map__popup-message__button map__popup-message__button--left">Cancel</button>
-					<button @click="allowGeolocation" class="map__popup-message__button map__popup-message__button--right">Retry</button>
-				</template>
-			</div>
-			<div class="map__modal"></div>
-		</template>
+		<div v-if="popUpMessageOpen" class="map__popup-message">
+			<template v-if="!errorMessage && !isLoading">
+				<span class="map__popup-message__head">
+					Allow us to use geolocation to determine your current location?
+					Geolocation is needed to use most of our features.
+				</span><br>
+				<span class="map__popup-message__note">
+					*We do not store any sensitive information.
+				</span><br>
+				<button @click="denyGeolocation" class="map__popup-message__button map__popup-message__button--left">Cancel</button>
+				<button @click="allowGeolocation" class="map__popup-message__button map__popup-message__button--right">OK</button>
+			</template>
+			<template v-if="isLoading">
+				<span class="map__popup-message__loading">Loading...</span>
+			</template>
+			<template v-if="errorMessage">
+				<span class="map__popup-message__head">
+					{{ errorMessage }}
+				</span>
+				<button @click="denyGeolocation" class="map__popup-message__button map__popup-message__button--left">Cancel</button>
+				<button @click="allowGeolocation" class="map__popup-message__button map__popup-message__button--right">Retry</button>
+			</template>
+		</div>
 		<button class="map__circle-button"
 			@click="panToUser">get position
 		</button>
@@ -131,6 +129,7 @@ export default {
 			reviewFormOpen: false,
 			loginFormOpen: false,
 			searchResultOpen: false,
+			reviewWindowOpen: false
 		}
 	},
 	firebase() {
@@ -185,6 +184,7 @@ export default {
 		},
 		denyGeolocation() {
 			this.popUpMessageOpen = false
+			this.errorMessage = null
 		},
 		panTo(position) {
 			this.$refs.locationMap.panTo(position)
@@ -232,6 +232,9 @@ export default {
 		},
 		closeUserMenu() {
 			this.userMenuOpen = false
+		},
+		openReviewWindow() {
+			this.reviewWindowOpen = true
 		}
 	}
 }
@@ -286,6 +289,9 @@ export default {
 				position: absolute;
 				right: 15px
 			}
+			&:active, &:focus {
+				outline-style: none;
+			}
 		}
 		&__loading {
 			@include font-default(black, 17px);
@@ -313,6 +319,9 @@ export default {
 		width: 50px;
 		height: 50px;
 		z-index: 1;
+		&:active, &:focus {
+			outline-style: none;
+		}
 	}
 }
 </style>

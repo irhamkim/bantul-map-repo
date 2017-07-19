@@ -1,14 +1,16 @@
 <template>
 	<div class="floating-menu">
-		<input class="floating-menu__search-input" type="text" placeholder="Search location"
-			v-model="searchKeyword"
-			@keyup.enter="searchLocation"
-			@keyup.esc="closeSearchResult">
+		<div class="floating-menu__search-input-wrapper">
+			<input class="floating-menu__search-input" type="text" placeholder="Search location"
+				v-model="searchKeyword"
+				@keyup.enter="searchLocation"
+				@keyup.esc="closeSearchResult">
+		</div>
 		<button class="floating-menu__flat-button"
 			@click="searchLocation">Search</button>		
 		<button v-if="isLoggedIn && !infoWindowOpen" class="floating-menu__button"
 			@click="openUserMenu">{{ userDisplayName }}</button>
-		<button v-if="isLoggedIn && infoWindowOpen" class="floating-menu__button"
+		<button v-if="infoWindowOpen" class="floating-menu__button"
 			@click="closeInfoWindow">Close</button>
 		<button v-if="!isLoggedIn" class="floating-menu__flat-button"
 			@click="openLoginForm">Login</button>
@@ -83,15 +85,27 @@ export default {
 	.floating-menu {
 		background-color: white;
 		border-radius: 5px;
-		-webkit-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
-		-moz-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 		box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 		position: absolute;
 		top: 5px;
 		left: 5px;
 		width: 420px;
 		height: 40px;
-		z-index: 2;
+		z-index: 3;
+		&__search-input-wrapper {
+			display: inline-block;
+			position: relative;
+			width: 260px;
+			height: 30px;
+			&::after {
+				border-right: 2px solid rgba(0, 0, 0, 0.25);
+				content: '';
+				position: absolute;
+				top: 5px;
+				right: 0;
+				height: 30px;
+			}
+		}
 		&__search-input {
 			box-sizing: border-box;
 			border: none;
@@ -105,12 +119,6 @@ export default {
 			margin: 5px 0 5px 5px;
 			&:active, &:focus {
 				outline-style: none;
-			}
-			&::after {
-				border-right: 2px solid black;
-				content: '';
-				position: absolute;
-				left: 0;
 			}
 		}
 		&__button {

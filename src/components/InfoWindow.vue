@@ -36,6 +36,10 @@
 				<span class="info-tab__review-item__content">{{ review.content }}</span>
 				<span class="info-tab__review-item__time">{{ submitTime(review.submitTime) }}</span>
 			</div>
+			<button class="info-tab__flat-button info-tab__flat-button--bottom"
+				@click="openReviewWindow">
+				More Reviews
+			</button>
 		</div>
 	</div>
 </template>
@@ -108,6 +112,9 @@ export default {
 			deleteReview() {
 				this.$firebaseRefs.userReview.remove()
 				this.$firebaseRefs.locationReviews.child(this.$store.state.user.uid).remove()
+			},
+			openReviewWindow() {
+				this.$emit('open-review-window')
 			}
 		}
 }
@@ -133,7 +140,7 @@ export default {
 	left: 0;
 	width: 430px;
 	height: 100%;
-	z-index: 1;
+	z-index: 2;
 	&__head {
 		width: 100%;
 		height: 300px;
@@ -159,6 +166,7 @@ export default {
 		}
 	}
 	&__reviews {
+		position: relative;
 		width: 100%;
 		height: calc(100% - 300px);
 		&__section {
@@ -247,6 +255,20 @@ export default {
 			position: absolute;
 			right: 10px;
 			bottom: 5px;
+		}
+	}
+	&__flat-button {
+		background-color: white;
+		border: none;
+		@include font-default(#00b27c, 17px);
+		&:active, &:focus {
+			outline-style: none;
+		}
+		&--bottom {
+			position: absolute;
+			bottom: 5px;
+			left: 50%;
+			transform: translate(-50%, 0);
 		}
 	}
 }
