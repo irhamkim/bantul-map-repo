@@ -8,12 +8,15 @@
 		</div>
 		<button class="floating-menu__flat-button"
 			@click="searchLocation">Search</button>		
-		<button v-if="isLoggedIn && !infoWindowOpen" class="floating-menu__button"
+		<button v-if="isLoggedIn && !windowOpen && !searchKeyword" class="floating-menu__button"
 			@click="openUserMenu">{{ userDisplayName }}</button>
-		<button v-if="infoWindowOpen" class="floating-menu__button"
-			@click="closeInfoWindow">Close</button>
-		<button v-if="!isLoggedIn" class="floating-menu__flat-button"
+		<button v-if="windowOpen && !searchKeyword" class="floating-menu__button"
+			@click="closeWindow">Close</button>
+		<button v-if="!isLoggedIn" class="floating-menu__button"
 			@click="openLoginForm">Login</button>
+		<button v-if="searchKeyword" class="floating-menu__button"
+			@click="closeSearchResult">Cancel
+		</button>
 	</div>
 </template>
 
@@ -38,6 +41,9 @@ export default {
 
 			return strSub.length < 6 ? strSub : strSub.substr(0, 6) + '..'
 		},
+		windowOpen() {
+			return this.$store.state.openWindow ? true : false
+		},
 		infoWindowOpen() {
 			return this.$store.state.infoWindowOpen ? true : false
 		}
@@ -46,13 +52,13 @@ export default {
 		searchLocation() {
 			if (this.searchKeyword) {
 				this.$store.commit('searchLocation', this.searchKeyword)
-				this.$emit('open-search-result')
+				this.$store.commit('openWindow', 'searchResult')
 			} else {
-				this.$emit('close-search-result')
+				this.$store.state.openWindow === 'infoWindow' ? '' : this.$store.commit('closeWindow')
 			}
 		},
 		openLoginForm() {
-			this.$emit('open-login-form')
+			this.$store.commit('openForm', 'loginForm')
 		},
 		logOutUser() {
 			firebase.auth().signOut().then(() => {
@@ -62,18 +68,17 @@ export default {
 			})
 		},
 		openUserMenu() {
-			this.$emit('open-user-menu')
+			this.$store.commit('openWindow', 'userMenu')
 		},
 		closeUserMenu() {
-			this.$emit('close-user-menu')
+			this.$store.commit('closeWindow')
 		},
 		closeSearchResult() {
 			this.searchKeyword = null
-			this.$emit('close-search-result')
+			this.$store.commit('closeWindow')
 		},
-		closeInfoWindow() {
-			this.$emit('close-info-window')
-			this.$store.commit('closeInfoWindow')
+		closeWindow() {
+			this.$store.commit('closeWindow')
 		},
 	}
 
@@ -86,24 +91,33 @@ export default {
 		background-color: white;
 		border-radius: 5px;
 		box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
+		box-sizing: border-box;
+		display: flex;
+		padding: 5px;
 		position: absolute;
 		top: 5px;
 		left: 5px;
 		width: 420px;
 		height: 40px;
 		z-index: 3;
+		@media (max-width : 429px) {
+			width: calc(100% - 10px);
+		}
 		&__search-input-wrapper {
-			display: inline-block;
+			display: flex;
+			flex: 1 1 auto;
 			position: relative;
-			width: 260px;
+			max-width: 70%;
 			height: 30px;
 			&::after {
 				border-right: 2px solid rgba(0, 0, 0, 0.25);
 				content: '';
 				position: absolute;
-				top: 5px;
 				right: 0;
 				height: 30px;
+			}
+			@media (max-width : 429px) {
+				
 			}
 		}
 		&__search-input {
@@ -112,36 +126,39 @@ export default {
 			color: rgba(0, 0, 0, 0.5);
 			font-family: Roboto, Helvetica;
 			font-size: 17px;
+			width: 100%;
 			padding-left: 5px;
-			position: relative;
-			width: 260px;
 			height: 30px;
-			margin: 5px 0 5px 5px;
 			&:active, &:focus {
 				outline-style: none;
 			}
+			@media (max-width : 429px) {
+				
+			}
 		}
 		&__button {
+			box-sizing: border-box;
 			background-color: #00b27c;
 			border: none;
 			color: white;
+			flex: 1 1 15%;
 			font-family: Roboto, Helvetica;
 			font-size: 17px;
-			width: 70px;
 			height: 30px;
-			&:active, &:focus {
+			&:focus {
 				outline-style: none;
 			}
 		}
 		&__flat-button {
+			box-sizing: border-box;
 			background-color: white;
 			border: none;
 			color: rgba(0, 0, 0, 0.5);
+			flex: 1 1 15%;
 			font-family: Roboto, Helvetica;
 			font-size: 17px;
-			width: 70px;
 			height: 30px;
-			&:active, &:focus {
+			&:focus {
 				outline-style: none;
 			}
 		}

@@ -1,27 +1,15 @@
 <template>
 	<div class="map">
-		<floating-menu
-			@open-login-form="openLoginForm"
-			@open-register-form="openRegisterForm"
-			@open-search-result="openSearchResult"
-			@close-search-result="closeSearchResult"
-			@open-user-menu="openUserMenu"
-			@close-user-menu="closeUserMenu"
-			@close-info-window="closeInfoWindow">
+		<floating-menu>
 		</floating-menu>
 		<info-window v-if="infoWindowOpen"
-			@open-login-form="openLoginForm"
-			@open-review-form="openReviewForm"
-			@open-review-window="openReviewWindow">
+			@set-height="setHeight">
 		</info-window>
-		<search-result v-if="searchResultOpen"
-			@close-search-result="closeSearchResult">
+		<search-result v-if="openWindow === 'searchResult'">
 		</search-result>
-		<login-form v-if="loginFormOpen"
-			@close-login-form="closeLoginForm">
+		<login-form v-if="openForm === 'loginForm'">
 		</login-form>
-		<review-form v-if="reviewFormOpen"
-			@close-review-form="closeReviewForm">
+		<review-form v-if="openForm === 'reviewForm'">
 		</review-form>
 		<div v-if="popUpMessageOpen" class="map__popup-message">
 			<template v-if="!errorMessage && !isLoading">
@@ -87,7 +75,6 @@ export default {
 						lat: position.lat,
 						lng: position.lng
 					}
-					this.infoWindowOpen = true;
 					this.$store.commit('openInfoWindow')
 				}
 			})
@@ -110,7 +97,6 @@ export default {
 		return {
 			styles: {
 				'width': '100%',
-				'height': '100%',
 				'z-index': 0
 			},
 			options: {
@@ -125,11 +111,17 @@ export default {
 			currentPosition: null,
 			isLoading: false,
 			errorMessage: null,
-			infoWindowOpen: false,
-			reviewFormOpen: false,
-			loginFormOpen: false,
-			searchResultOpen: false,
-			reviewWindowOpen: false
+		}
+	},
+	computed: {
+		infoWindowOpen() {
+			return this.$store.state.infoWindowOpen
+		},
+		openWindow() {
+			return this.$store.state.openWindow
+		},
+		openForm() {
+			return this.$store.state.openForm
 		}
 	},
 	firebase() {
@@ -145,6 +137,9 @@ export default {
 		SearchResult
 	},
 	methods: {
+		setHeight(h) {
+			h ? this.styles.height = h +'px' : this.styles.height = '100%'
+		},
 		allowGeolocation() {
 			this.errorMessage = null
 			this.isLoading = true
@@ -198,52 +193,18 @@ export default {
 		},
 		openInfoWindow(key) {
 			this.$router.push({ query: { location: key } })
-			this.infoWindowOpen = true
 			this.$store.commit('openInfoWindow')
 		},
 		closeInfoWindow() {
-			this.infoWindowOpen = false
 			this.$router.push({ query: '' })
 			this.$store.commit('closeInfoWindow')
 		},
-		openReviewForm() {
-			this.reviewFormOpen = true
-		},
-		closeReviewForm() {
-			this.reviewFormOpen = false
-		},
-		openLoginForm() {
-			this.loginFormOpen = true
-		},
-		closeLoginForm() {
-			this.loginFormOpen = false
-		},
-		openRegisterForm() {
-			this.reviewFormOpen = true
-		},
-		openSearchResult() {
-			this.searchResultOpen = true
-		},
-		closeSearchResult() {
-			this.searchResultOpen = false
-		},
-		openUserMenu() {
-			this.userMenuOpen = true
-		},
-		closeUserMenu() {
-			this.userMenuOpen = false
-		},
-		openReviewWindow() {
-			this.reviewWindowOpen = true
-		}
 	}
 }
 </script>
 
 <style lang="scss">
 @mixin box-shadow {
-	-webkit-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
-	-moz-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 	box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 }
 @mixin font-default($color, $size) {
@@ -260,6 +221,8 @@ export default {
 	&__popup-message {
 		background-color: white;
 		border-radius: 5px;
+		box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
+		box-sizing: border-box;
 		display: inline-block;
 		padding: 15px;
 		position: absolute;

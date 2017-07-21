@@ -7,12 +7,10 @@ let store = new Vuex.Store({
 	state: {
 		user: null,
 		keyword: null,
-		infoWindowOpen: false
-	},
-	getters: {
-		userDisplayName: function(state) {
-			
-		}
+		infoWindowOpen: false,
+		openWindow: null,
+		openForm: null,
+		height: null,
 	},
 	mutations: {
 		setUserState: function(state, user) {
@@ -29,7 +27,22 @@ let store = new Vuex.Store({
 		},
 		closeInfoWindow(state) {
 			state.infoWindowOpen = false
-		}
+		},
+		openWindow(state, payload) {
+			state.openWindow = payload
+		},
+		closeWindow(state) {
+			state.openWindow = null
+		},
+		openForm(state, payload) {
+			state.openForm = payload
+		},
+		closeForm(state) {
+			state.openForm = null
+		},
+		setHeight(state, payload) {
+			state.height = payload
+		},
 	},
 	actions: {
 		

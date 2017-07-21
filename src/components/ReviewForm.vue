@@ -1,14 +1,15 @@
 <template>
 	<div class="review-form">
+		<div class="review-form__header"></div>
 			<button @click="closeReviewForm">X</button>
-		<template v-if="isEditMode">
-		<input type="text" v-model.trim="contentEdit.content">
-			<button @click="editReview">Submit</button>
-		</template>
-		<template v-else>
-			<input type="text" v-model.trim="content">
-			<button @click="submitReview">Submit</button>
-		</template>
+		<div v-if="contentEdit" class="review-form__wrapper">
+			<input class="review-form__input" type="text" v-model.trim="contentEdit.content">
+			<button class="review-form__floating-button" @click="editReview">Submit</button>
+		</div>
+		<div v-else class="review-form__wrapper">
+			<input class="review-form__input" type="text" v-model.trim="content">
+			<button class="review-form__float-button" @click="submitReview">Submit</button>
+		</div>
 	</div>
 </template>
 
@@ -34,14 +35,9 @@ export default {
 			}
 		}
 	},
-	computed: {
-		isEditMode() {
-			return this.contentEdit ? true : false
-		}
-	},
 	methods: {
 		closeReviewForm() {
-			this.$emit('close-review-form')
+			this.$store.commit('closeForm')
 		},
 		submitReview() {
 			if (this.content) {
@@ -54,9 +50,9 @@ export default {
 					content: this.content,
 					submitTime: firebase.database.ServerValue.TIMESTAMP
 				})
-				this.$emit('close-review-form')
+				this.$store.commit('openWindow', 'infoWindow')
 			} else {
-				this.$emit('close-review-form')
+				this.$store.commit('openWindow', 'infoWindow')
 			}
 		},
 		editReview() {
@@ -70,9 +66,9 @@ export default {
 					content: this.contentEdit.content,
 					submitTime: firebase.database.ServerValue.TIMESTAMP
 				})
-				this.$emit('close-review-form')
+				this.$store.commit('openWindow', 'infoWindow')
 			} else {
-				this.$emit('close-review-form')
+				this.$store.commit('openWindow', 'infoWindow')
 			}
 		}
 	}
@@ -81,17 +77,57 @@ export default {
 </script>
 
 <style lang="scss">
+	@mixin box-shadow {
+		box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
+	}
+
+	@mixin font-default($color, $size) {
+		color: $color;
+		font-family: Roboto, Helvetica;
+		font-size: $size;
+	}
+
 	.review-form {
 		background-color: white;
-		-webkit-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
-		-moz-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 		box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
+		box-sizing: border-box;
+		overflow: hidden;
 		position: absolute;
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
 		width: 400px;
 		height: 300px;
-		z-index: 2;
-	}
+		z-index: 3;
+		@media (max-width: 429px) {
+			box-shadow: none;
+			width: 100%;
+			min-height: 100%;
+			top: 0;
+			left: 0;
+			transform: none;
+		}
+		&__wrapper {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+		&__input {
+			border: 2px solid #00b27c;
+			&:focus {
+				outline-style: none;
+			}
+		}
+		&__float-button {
+			background-color: #00b27c;
+			border: none;
+			@include box-shadow;
+			color: white;
+			@include font-default(white, 17px);
+			&:focus {
+				outline-style: none;
+			}
+		}
+	}	
 </style>

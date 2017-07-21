@@ -1,33 +1,41 @@
 <template>
 	<div class="info-tab">
 		<div class="info-tab__head">
-			<div class="info-tab__head__section"></div>
+			<div class="info-tab__head__section">
+				<div class="info-tab__head__title">
+					{{ locationData.name }}
+				</div>
+				<button class="info-tab__head__flat-button"
+					@click="closeInfoWindow">
+					X
+				</button>
+			</div>
 			<div class="info-tab__head__image">
 				This is a placeholder image for location {{ this.$route.query.location }}
 			</div>
 			<div class="info-tab__head__section info-tab__head__section--bottom">
 				<div class="info-tab__head__title">
-					{{ locationData.name }}
+					{{ locationData.address }}
 				</div>
 			</div>
 		</div>
 		<div class="info-tab__reviews">
 			<div v-if="!isLoggedIn"
 				class="info-tab__reviews__section">
-				<button class="info-tab__button info-tab__button--login"
+				<button class="info-tab__float-button info-tab__float-button--login"
 					@click="openLoginForm">Login</button>
 			</div>
 			<div v-if="isLoggedIn && !currentUserReviewed"
 				class="info-tab__reviews__section">
-				<button class="info-tab__button info-tab__button--write"
+				<button class="info-tab__float-button info-tab__float-button--write"
 					@click="openReviewForm">Write Review</button>
 			</div>
 			<div v-if="currentUserReviewed"
 				class="info-tab__reviews__section">
 				<span class="info-tab__reviews__user-review">{{ userReview.content }}</span>
-				<button class="info-tab__button info-tab__button--edit"
+				<button class="info-tab__float-button info-tab__float-button--edit"
 					@click="openReviewForm">Edit</button>
-				<button class="info-tab__button info-tab__button--delete"
+				<button class="info-tab__float-button info-tab__float-button--delete"
 					@click="deleteReview">Delete</button>
 			</div>
 			<div v-for="(review, index) in orderedReviews" :key="index"
@@ -36,11 +44,11 @@
 				<span class="info-tab__review-item__content">{{ review.content }}</span>
 				<span class="info-tab__review-item__time">{{ submitTime(review.submitTime) }}</span>
 			</div>
-			<button class="info-tab__flat-button info-tab__flat-button--bottom"
-				@click="openReviewWindow">
-				More Reviews
-			</button>
 		</div>
+		<button class="info-tab__flat-button info-tab__flat-button--bottom"
+			@click="openReviewWindow">
+			More Reviews
+		</button>
 	</div>
 </template>
 
@@ -54,6 +62,13 @@ export default {
 			if (this.$store.state.user) {
 				this.$bindAsObject('userReview', firebase.database().ref('users').child(this.$store.state.user.uid).child('reviews').child(this.$route.query.location))
 			}
+		},
+		mounted() {
+			let h = this.$el.clientHeight
+			this.$emit('set-height', h)
+		},
+		destroyed() {
+			this.$emit('set-height', null)
 		},
 		data() {
 			return {
@@ -104,17 +119,20 @@ export default {
 				return moment(time).calendar()
 			},
 			openReviewForm() {
-				this.$emit('open-review-form')
+				this.$store.commit('openForm', 'reviewForm')
 			},
 			openLoginForm() {
-				this.$emit('open-login-form')
+				this.$store.commit('openForm', 'loginForm')
 			},
 			deleteReview() {
 				this.$firebaseRefs.userReview.remove()
 				this.$firebaseRefs.locationReviews.child(this.$store.state.user.uid).remove()
 			},
 			openReviewWindow() {
-				this.$emit('open-review-window')
+				this.$store.commit('openWindow', 'reviewWindow')
+			},
+			closeInfoWindow() {
+				this.$store.commit('closeInfoWindow')
 			}
 		}
 }
@@ -122,8 +140,6 @@ export default {
 
 <style lang="scss">
 @mixin box-shadow {
-	-webkit-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
-	-moz-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 	box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 }
 @mixin font-default($color, $size) {
@@ -134,13 +150,13 @@ export default {
 
 .info-tab {
 	background-color: white;
-	margin-left: 0;
 	position: absolute;
-	top: 0;
-	left: 0;
 	width: 430px;
-	height: 100%;
-	z-index: 2;
+	min-height: 100%;
+	z-index: 4;
+	@media (max-width : 429px) {
+		width: 100%;
+	}
 	&__head {
 		width: 100%;
 		height: 300px;
@@ -164,11 +180,22 @@ export default {
 			top: 15px;
 			left: 5px;
 		}
+		&__flat-button {
+			background-color: #00b27c;
+			border: none;
+			color: white;
+			font-size: 22px;
+			position: absolute;
+			top: 10px;
+			right: 5px;
+			&:focus {
+				outline-style: none;
+			}
+		}
 	}
 	&__reviews {
 		position: relative;
 		width: 100%;
-		height: calc(100% - 300px);
 		&__section {
 			border-bottom: 3px solid #00b27c;
 			position: relative;
@@ -192,13 +219,13 @@ export default {
 			text-align: justify;
 		}
 	}
-	&__button {
+	&__float-button {
 		background-color: #00b27c;
 		border: none;
 		@include box-shadow;
 		color: white;
 		@include font-default(white, 17px);
-		&:active, &:focus {
+		&:focus {
 			outline-style: none;
 		}
 		&--write {
@@ -261,7 +288,7 @@ export default {
 		background-color: white;
 		border: none;
 		@include font-default(#00b27c, 17px);
-		&:active, &:focus {
+		&:focus {
 			outline-style: none;
 		}
 		&--bottom {
