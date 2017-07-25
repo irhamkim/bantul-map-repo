@@ -5,9 +5,8 @@
 				<div class="info-tab__head__title">
 					{{ locationData.name }}
 				</div>
-				<button class="info-tab__head__flat-button"
+				<button class="info-tab__head__flat-button info-tab__head__flat-button--close"
 					@click="closeInfoWindow">
-					X
 				</button>
 			</div>
 			<div class="info-tab__head__image">
@@ -32,7 +31,7 @@
 			</div>
 			<div v-if="currentUserReviewed"
 				class="info-tab__reviews__section">
-				<span class="info-tab__reviews__user-review">{{ userReview.content }}</span>
+				<div class="info-tab__reviews__user-review">{{ userReview.content }}</div>
 				<button class="info-tab__float-button info-tab__float-button--edit"
 					@click="openReviewForm">Edit</button>
 				<button class="info-tab__float-button info-tab__float-button--delete"
@@ -64,6 +63,10 @@ export default {
 			}
 		},
 		mounted() {
+			let h = this.$el.clientHeight
+			this.$emit('set-height', h)
+		},
+		updated() {
 			let h = this.$el.clientHeight
 			this.$emit('set-height', h)
 		},
@@ -152,7 +155,7 @@ export default {
 	background-color: white;
 	position: absolute;
 	width: 430px;
-	min-height: 100%;
+	min-height: 100vh;
 	z-index: 4;
 	@media (max-width : 429px) {
 		width: 100%;
@@ -162,11 +165,11 @@ export default {
 		height: 300px;
 		&__section {
 			background-color: #00b27c;
+			position: relative;
 			width: 100%;
 			height: 50px;
 			&--bottom {
 				@include box-shadow;
-				position: relative;
 			}
 		}
 		&__image {
@@ -185,11 +188,25 @@ export default {
 			border: none;
 			color: white;
 			font-size: 22px;
-			position: absolute;
-			top: 10px;
-			right: 5px;
 			&:focus {
 				outline-style: none;
+			}
+			&--close {
+				position: absolute;
+				top: 50%;
+				right: 20px;
+				transform: translate(0, -50%);
+				&::before {
+					background: url(../assets/cancel-white.svg);
+					background-size: 20px;
+					content: '';
+					position: absolute;
+					top: 50%;
+					left: 50%;
+					transform: translate(-50%, -50%);
+					width: 20px;
+					height: 20px;
+				}
 			}
 		}
 	}
@@ -200,7 +217,7 @@ export default {
 			border-bottom: 3px solid #00b27c;
 			position: relative;
 			width: 100%;
-			height: 130px;
+			height: 200px;
 			&::after {
 				content: 'Reviews';
 				@include font-default(#00b27c, 20px);
@@ -210,21 +227,24 @@ export default {
 			}
 		}
 		&__user-review {
-			@include font-default(#00b27c, 15px)
+			@include font-default(black, 15px)
 			position: absolute;
-			top: 20%;
+			top: 15%;
 			left: 50%;
-			transform: translate(-50%, -50%);
-			width: 250px;
+			transform: translate(-50%, 0);
+			width: 350px;
 			text-align: justify;
+			word-wrap: break-word;
 		}
 	}
 	&__float-button {
 		background-color: #00b27c;
 		border: none;
 		@include box-shadow;
+		box-sizing: border-box;
 		color: white;
 		@include font-default(white, 17px);
+		padding: 5px 7px;
 		&:focus {
 			outline-style: none;
 		}
@@ -233,49 +253,48 @@ export default {
 			top: 50%;
 			left: 50%;
 			transform: translate(-50%, -50%);
-			width: 90px;
-			height: 50px;
 		}
 		&--login {
 			position: absolute;
 			top: 50%;
 			left: 50%;
 			transform: translate(-50%, -50%);
-			width: 70px;
-			height: 30px;
+			width: 65px;
 		}
 		&--edit {
 			position: absolute;
 			top: 70%;
-			left: 40%;
+			left: 35%;
 			transform: translate(-50%, -50%);
-			width: 50px;
-			height: 30px;
+			width: 65px;
 		}
 		&--delete {
 			position: absolute;
 			top: 70%;
-			left: 60%;
+			left: 65%;
 			transform: translate(-50%, -50%);
-			width: 70px;
-			height: 30px;
+			width: 65px;
 		}
 	}
 	&__review-item {
 		border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 		position: relative;
 		width: 100%;
-		height: 90px;
+		height: 100px;
 		&__user {
 			@include font-default(black, 15px);
+			font-weight: 700;
 			position: absolute;
 			top: 5px;
 			left: 10px;
 		}
 		&__content {
+			@include font-default(black, 15px);
 			position: absolute;
 			top: 22px;
 			left: 10px;
+			width: 400px;
+			word-wrap: break-word;
 		}
 		&__time {
 			@include font-default(#00b27c, 9px);
@@ -296,6 +315,7 @@ export default {
 			bottom: 5px;
 			left: 50%;
 			transform: translate(-50%, 0);
+			width: 100%;
 		}
 	}
 }

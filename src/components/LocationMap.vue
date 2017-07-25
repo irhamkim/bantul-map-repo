@@ -1,7 +1,7 @@
 <template>
 	<div class="map">
-		<floating-menu>
-		</floating-menu>
+		<omnibox>
+		</omnibox>
 		<info-window v-if="infoWindowOpen"
 			@set-height="setHeight">
 		</info-window>
@@ -49,8 +49,7 @@
 </template>
 
 <script>
-import FloatingMenu from './FloatingMenu'
-import InfoWindow from './InfoWindow'
+import Omnibox from './Omnibox'
 import LoginForm from './LoginForm'
 import ReviewForm from './ReviewForm'
 import SearchResult from './SearchResult'
@@ -75,7 +74,6 @@ export default {
 						lat: position.lat,
 						lng: position.lng
 					}
-					this.$store.commit('openInfoWindow')
 				}
 			})
 		}
@@ -84,7 +82,6 @@ export default {
 				this.$store.commit('setUserState', user)
 				firebase.database().ref('users').on('value', (snapshot) => {
 					if (!snapshot.hasChild(this.$store.state.user.uid)) {
-						
 						firebase.database().ref('users').child(this.$store.state.user.uid).set({
 							i: 1
 						})
@@ -99,6 +96,7 @@ export default {
 				'width': '100%',
 				'z-index': 0
 			},
+			
 			options: {
 				disableDefaultUI: true
 			},
@@ -130,11 +128,11 @@ export default {
 		}
 	},
 	components: {
-		FloatingMenu,
-		InfoWindow,
-		LoginForm,
-		ReviewForm,
-		SearchResult
+		Omnibox,
+		InfoWindow: () => import('./InfoWindow'),
+		LoginForm: () => import('./LoginForm'),
+		ReviewForm: () => import('./ReviewForm'),
+		SearchResult: () => import('./SearchResult')
 	},
 	methods: {
 		setHeight(h) {

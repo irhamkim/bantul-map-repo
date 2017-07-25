@@ -1,14 +1,28 @@
 <template>
 	<div class="review-form">
-		<div class="review-form__header"></div>
-			<button @click="closeReviewForm">X</button>
-		<div v-if="contentEdit" class="review-form__wrapper">
-			<input class="review-form__input" type="text" v-model.trim="contentEdit.content">
-			<button class="review-form__floating-button" @click="editReview">Submit</button>
+		<div class="review-form__header">
+			<button class="review-form__flat-button review-form__flat-button--close"
+				@click="closeReviewForm">
+			</button>
 		</div>
-		<div v-else class="review-form__wrapper">
-			<input class="review-form__input" type="text" v-model.trim="content">
-			<button class="review-form__float-button" @click="submitReview">Submit</button>
+		<div class="review-form__wrapper">
+			<div class="review-form__character-limit">
+				<span class="">{{ totalCharacters }}</span>
+			</div>
+			<template v-if="contentEdit.content">
+				<textarea class="review-form__input" type="text"
+					v-model.trim="contentEdit.content"
+					maxlength="160">
+				</textarea>
+				<button class="review-form__float-button" @click="editReview">Submit</button>
+			</template>
+			<template v-else>
+				<textarea class="review-form__input" type="text"
+					v-model.trim="content"
+					maxlength="160" >
+				</textarea>
+				<button class="review-form__float-button" @click="submitReview">Submit</button>
+			</template>
 		</div>
 	</div>
 </template>
@@ -35,12 +49,25 @@ export default {
 			}
 		}
 	},
+	computed: {
+		totalCharacters() {
+			if (this.content  || this.contentEdit.content) {
+				let c = this.content ? this.content.length : this.contentEdit.content.length
+				return c
+			} else {
+				return 0
+			}
+		},
+		characterLimit() {
+			return this.totalCharacters > 160 ? true : false
+		}
+	},
 	methods: {
 		closeReviewForm() {
 			this.$store.commit('closeForm')
 		},
 		submitReview() {
-			if (this.content) {
+			if (this.content && (this.content.length <= 160)) {
 				this.$firebaseRefs.locationReviews.child(this.$store.state.user.uid).set({ 
 					content: this.content,
 					submitTime: firebase.database.ServerValue.TIMESTAMP,
@@ -50,13 +77,13 @@ export default {
 					content: this.content,
 					submitTime: firebase.database.ServerValue.TIMESTAMP
 				})
-				this.$store.commit('openWindow', 'infoWindow')
+				this.$store.commit('closeForm')
 			} else {
-				this.$store.commit('openWindow', 'infoWindow')
+				this.$store.commit('closeForm')
 			}
 		},
 		editReview() {
-			if (this.contentEdit.content) {
+			if (this.contentEdit.content && (this.contentEdit.content.length <= 160)) {
 				this.$firebaseRefs.locationReviews.child(this.$store.state.user.uid).set({ 
 					content: this.contentEdit.content,
 					submitTime: firebase.database.ServerValue.TIMESTAMP,
@@ -66,9 +93,9 @@ export default {
 					content: this.contentEdit.content,
 					submitTime: firebase.database.ServerValue.TIMESTAMP
 				})
-				this.$store.commit('openWindow', 'infoWindow')
+				this.$store.commit('closeForm')
 			} else {
-				this.$store.commit('openWindow', 'infoWindow')
+				this.$store.commit('closeForm')
 			}
 		}
 	}
@@ -98,7 +125,7 @@ export default {
 		transform: translate(-50%, -50%);
 		width: 400px;
 		height: 300px;
-		z-index: 3;
+		z-index: 4;
 		@media (max-width: 429px) {
 			box-shadow: none;
 			width: 100%;
@@ -107,14 +134,78 @@ export default {
 			left: 0;
 			transform: none;
 		}
+		&__header {
+			background-color: #00b27c;
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 30px;
+			@media (max-width: 429px) {
+				height: 50px;
+			}
+		}
 		&__wrapper {
 			position: absolute;
-			top: 50%;
+			top: 55%;
 			left: 50%;
 			transform: translate(-50%, -50%);
+			width: 350px;
+			height: 220px;
+			&::before {
+				content: 'Write A Review';
+				@include font-default(black, 17px);
+				height: 25px;
+			}
+			&::after {
+				content: '/160';
+				@include font-default(black, 17px);
+				position: absolute;
+				top: 0;
+				right: 0;
+			}
+		}
+		&__character-limit {
+			position: absolute;
+			@include font-default(black, 17px);
+			top: 0;
+			right: 37px;
 		}
 		&__input {
+			background-color: rgba(100, 100, 100, 0.25);
 			border: 2px solid #00b27c;
+			box-sizing: border-box;
+			@include font-default(black, 17px);
+			padding: 2px;
+			resize: none;
+			width: 350px;
+			height: 150px;
+			&:focus {
+				outline-style: none;
+			}
+		}
+		&__flat-button {
+			border: none;
+			&--close {
+				background-color: #00b27c;
+				position: absolute;
+				top: 50%;
+				right: 5px;
+				transform: translate(-50%, -50%);
+				width: 30px;
+				height: 30px;
+				&::before {
+					background: url(../assets/cancel-white.svg);
+					background-size: 20px 20px;
+					content: '';
+					position: absolute;
+					top: 50%;
+					left: 50%;
+					transform: translate(-50%, -50%);
+					width: 20px;
+					height: 20px;
+				}
+			}
 			&:focus {
 				outline-style: none;
 			}
@@ -123,8 +214,13 @@ export default {
 			background-color: #00b27c;
 			border: none;
 			@include box-shadow;
+			box-sizing: border-box;
 			color: white;
 			@include font-default(white, 17px);
+			padding: 5px;
+			position: absolute;
+			right: 0;
+			bottom: 0;
 			&:focus {
 				outline-style: none;
 			}

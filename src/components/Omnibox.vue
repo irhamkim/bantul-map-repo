@@ -6,15 +6,14 @@
 				@keyup.enter="searchLocation"
 				@keyup.esc="closeSearchResult">
 		</div>
-		<button class="floating-menu__flat-button"
-			@click="searchLocation">Search</button>		
-		<button v-if="isLoggedIn && !windowOpen && !searchKeyword" class="floating-menu__button"
-			@click="openUserMenu">{{ userDisplayName }}</button>
-		<button v-if="windowOpen && !searchKeyword" class="floating-menu__button"
-			@click="closeWindow">Close</button>
-		<button v-if="!isLoggedIn" class="floating-menu__button"
-			@click="openLoginForm">Login</button>
-		<button v-if="searchKeyword" class="floating-menu__button"
+		<button class="floating-menu__flat-button floating-menu__flat-button--search"
+			@click="searchLocation"></button>
+		<button v-if="windowOpen && !searchKeyword" class="floating-menu__flat-button floating-menu__flat-button--cancel"
+			@click="closeWindow"></button>
+		<button v-if="!windowOpen && !searchKeyword" class="floating-menu__flat-button floating-menu__flat-button--menu"
+			@click="openMenu">
+		</button>
+		<button v-if="!windowOpen && searchKeyword" class="floating-menu__flat-button"
 			@click="closeSearchResult">Cancel
 		</button>
 	</div>
@@ -67,10 +66,10 @@ export default {
 
 			})
 		},
-		openUserMenu() {
+		openMenu() {
 			this.$store.commit('openWindow', 'userMenu')
 		},
-		closeUserMenu() {
+		closeMenu() {
 			this.$store.commit('closeWindow')
 		},
 		closeSearchResult() {
@@ -107,23 +106,15 @@ export default {
 			display: flex;
 			flex: 1 1 auto;
 			position: relative;
-			max-width: 70%;
+			min-width: 70%;
 			height: 30px;
-			&::after {
-				border-right: 2px solid rgba(0, 0, 0, 0.25);
-				content: '';
-				position: absolute;
-				right: 0;
-				height: 30px;
-			}
 			@media (max-width : 429px) {
 				
 			}
 		}
 		&__search-input {
-			box-sizing: border-box;
 			border: none;
-			color: rgba(0, 0, 0, 0.5);
+			box-sizing: border-box;
 			font-family: Roboto, Helvetica;
 			font-size: 17px;
 			width: 100%;
@@ -137,9 +128,9 @@ export default {
 			}
 		}
 		&__button {
-			box-sizing: border-box;
 			background-color: #00b27c;
 			border: none;
+			box-sizing: border-box;
 			color: white;
 			flex: 1 1 15%;
 			font-family: Roboto, Helvetica;
@@ -157,9 +148,57 @@ export default {
 			flex: 1 1 15%;
 			font-family: Roboto, Helvetica;
 			font-size: 17px;
+			position: relative;
 			height: 30px;
 			&:focus {
 				outline-style: none;
+			}
+			&--search {
+				&::before {
+					background: url(../assets/magnifying-glass.svg);
+					background-size: 20px 20px;
+					content: '';
+					position: absolute;
+					top: 50%;
+					left: 50%;
+					transform: translate(-50%, -50%);
+					width: 20px;
+					height: 20px;
+				}
+				&::after {
+					content: '';
+					border-right: 2px solid #cccccc;
+					position: absolute;
+					top: 0;
+					right: 0;
+					height: 30px;
+				}
+			}
+			&--menu {
+				&::after {
+					background: url(../assets/menu.svg);
+					background-size: 20px 20px;
+					content: '';
+					position: absolute;
+					top: 50%;
+					left: 50%;
+					transform: translate(-50%, -50%);
+					width: 20px;
+					height: 20px;
+				}
+			}
+			&--cancel {
+				&::after {
+					background: url(../assets/cancel.svg);
+					background-size: 20px 20px;
+					content: '';
+					position: absolute;
+					top: 50%;
+					left: 50%;
+					transform: translate(-50%, -50%);
+					width: 20px;
+					height: 20px;
+				}
 			}
 		}
 	}
