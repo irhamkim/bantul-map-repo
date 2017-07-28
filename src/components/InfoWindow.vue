@@ -17,6 +17,9 @@
 					{{ locationData.address }}
 				</div>
 			</div>
+			<button class="info-tab__direction-button"
+				@click="getDirection">
+			</button>
 		</div>
 		<div class="info-tab__reviews">
 			<div v-if="!isLoggedIn"
@@ -52,9 +55,8 @@
 </template>
 
 <script>
-import firebase from '../firebaseApp'
 import * as moment from 'moment'
-
+import firebase from '../firebaseConfig'
 export default {
 		name: 'infoWindow',
 		beforeMount() {
@@ -121,6 +123,9 @@ export default {
 			submitTime(time) {
 				return moment(time).calendar()
 			},
+			getDirection() {
+				this.$emit('get-direction', this.locationData.position)
+			},
 			openReviewForm() {
 				this.$store.commit('openForm', 'reviewForm')
 			},
@@ -161,6 +166,7 @@ export default {
 		width: 100%;
 	}
 	&__head {
+		position: relative;
 		width: 100%;
 		height: 300px;
 		&__section {
@@ -173,6 +179,7 @@ export default {
 			}
 		}
 		&__image {
+			background-color: black;
 			width: 100%;
 			height: 200px;
 		}
@@ -208,6 +215,31 @@ export default {
 					height: 20px;
 				}
 			}
+		}
+	}
+	&__direction-button{
+		background-color: white;
+		border: none;
+		border-radius: 50%;
+		position: absolute;
+		bottom: 50px;
+		right: 15px;
+		transform: translate(0, 50%);
+		width: 50px;
+		height: 50px;
+		&:focus {
+			outline-style: none;
+		}
+		&::before {
+			background: url(../assets/compass.svg);
+			background-size: 30px;
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-45%,-45%);
+			width: 30px;
+			height: 30px;
 		}
 	}
 	&__reviews {

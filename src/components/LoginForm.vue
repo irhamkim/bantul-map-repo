@@ -38,7 +38,7 @@
 </template>
 
 <script>
-  import firebase from '../firebaseApp'
+  import firebase from '../firebaseConfig'
   export default {
 	name: 'loginForm',
 	data: function () {
@@ -75,7 +75,7 @@
 			}
 		},
 		closeLoginForm() {
-			this.$emit('close-login-form')
+			this.$store.commit('closeForm')
 		}
 	}	
   }
@@ -84,8 +84,6 @@
 <style lang="scss">
 	.login-form {
 		background-color: white;
-		-webkit-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
-		-moz-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 		box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 		font-family: Roboto, Helvetica;
 		font-size: 17px;
@@ -96,7 +94,7 @@
 		transform: translate(-50%, -50%);
 		width: 500px;
 		height: 400px;
-		z-index: 2;
+		z-index: 5;
 		&__loading {
 			background-color: white;
 			position: relative;
@@ -127,6 +125,9 @@
 			background-color: white;
 			border: none;
 			color: gray;
+			&:focus {
+				outline-style: none;
+			}
 			&--close {
 				position: absolute;
 				right: 15px;
@@ -174,6 +175,9 @@
 			border-radius: 50%;
 			width: 70px;
 			height: 70px;
+			&:focus {
+				outline-style: none;
+			}
 			&--google {
 
 			}

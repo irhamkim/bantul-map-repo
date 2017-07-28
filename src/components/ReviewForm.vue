@@ -7,7 +7,7 @@
 		</div>
 		<div class="review-form__wrapper">
 			<div class="review-form__character-limit">
-				<span class="">{{ totalCharacters }}</span>
+				<span :class="{'review-form__character-limit--is-on-limit': characterLimit }">{{ totalCharacters }}</span>
 			</div>
 			<template v-if="contentEdit.content">
 				<textarea class="review-form__input" type="text"
@@ -27,8 +27,7 @@
 	</div>
 </template>
 
-<script>
-import firebase from '../firebaseApp'
+<script>import firebase from '../firebaseConfig'
 
 export default {
 	name: 'reviewForm',
@@ -59,7 +58,7 @@ export default {
 			}
 		},
 		characterLimit() {
-			return this.totalCharacters > 160 ? true : false
+			return this.totalCharacters >= 160 ? true : false
 		}
 	},
 	methods: {
@@ -116,16 +115,16 @@ export default {
 
 	.review-form {
 		background-color: white;
-		box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
+		@inlcude box-shadow;
 		box-sizing: border-box;
 		overflow: hidden;
 		position: absolute;
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
-		width: 400px;
-		height: 300px;
-		z-index: 4;
+		width: 500px;
+		height: 400px;
+		z-index: 5;
 		@media (max-width: 429px) {
 			box-shadow: none;
 			width: 100%;
@@ -153,7 +152,7 @@ export default {
 			width: 350px;
 			height: 220px;
 			&::before {
-				content: 'Write A Review';
+				content: 'Write a review';
 				@include font-default(black, 17px);
 				height: 25px;
 			}
@@ -170,6 +169,9 @@ export default {
 			@include font-default(black, 17px);
 			top: 0;
 			right: 37px;
+			&--is-on-limit {
+				@include font-default(red, 17px);
+			}
 		}
 		&__input {
 			background-color: rgba(100, 100, 100, 0.25);
@@ -192,18 +194,18 @@ export default {
 				top: 50%;
 				right: 5px;
 				transform: translate(-50%, -50%);
-				width: 30px;
-				height: 30px;
+				width: 15px;
+				height: 15px;
 				&::before {
 					background: url(../assets/cancel-white.svg);
-					background-size: 20px 20px;
+					background-size: 15px;
 					content: '';
 					position: absolute;
 					top: 50%;
 					left: 50%;
 					transform: translate(-50%, -50%);
-					width: 20px;
-					height: 20px;
+					width: 15px;
+					height: 15px;
 				}
 			}
 			&:focus {
@@ -225,5 +227,6 @@ export default {
 				outline-style: none;
 			}
 		}
-	}	
+	}
+
 </style>

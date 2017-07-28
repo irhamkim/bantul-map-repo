@@ -19,7 +19,6 @@
 </template>
 
 <script>
-import firebase from '../firebaseApp'
 	export default {
 		name: 'SearchResult',
 		data() {

@@ -3,14 +3,13 @@
 		<omnibox>
 		</omnibox>
 		<info-window v-if="infoWindowOpen"
-			@set-height="setHeight">
+			@set-height="setHeight"
+			@get-direction="getDirection">
 		</info-window>
 		<search-result v-if="openWindow === 'searchResult'">
 		</search-result>
-		<login-form v-if="openForm === 'loginForm'">
-		</login-form>
-		<review-form v-if="openForm === 'reviewForm'">
-		</review-form>
+		<user-menu v-if="userMenuOpen"></user-menu>
+		<omniform v-if="openForm"></omniform>
 		<div v-if="popUpMessageOpen" class="map__popup-message">
 			<template v-if="!errorMessage && !isLoading">
 				<span class="map__popup-message__head">
@@ -23,10 +22,10 @@
 				<button @click="denyGeolocation" class="map__popup-message__button map__popup-message__button--left">Cancel</button>
 				<button @click="allowGeolocation" class="map__popup-message__button map__popup-message__button--right">OK</button>
 			</template>
-			<template v-if="isLoading">
+			<template v-if="isLoading && !errorMessage">
 				<span class="map__popup-message__loading">Loading...</span>
 			</template>
-			<template v-if="errorMessage">
+			<template v-if="errorMessage && !isLoading">
 				<span class="map__popup-message__head">
 					{{ errorMessage }}
 				</span>
@@ -35,7 +34,8 @@
 			</template>
 		</div>
 		<button class="map__circle-button"
-			@click="panToUser">get position
+			:class="{ 'map__circle-button--position-fixed': currentPosition, 'map__circle-button--position-not-fix': !currentPosition }"
+			@click="panToUser">
 		</button>
 		<gmap-map ref="locationMap" :center="initialCenter" :zoom="18" 
 			:options="options" :style="styles">
@@ -50,12 +50,12 @@
 
 <script>
 import Omnibox from './Omnibox'
-import LoginForm from './LoginForm'
-import ReviewForm from './ReviewForm'
+import Omniform from './Omniform'
 import SearchResult from './SearchResult'
+import UserMenu from './UserMenu'
 import Vue from 'vue'
 import * as VueGoogleMaps from 'vue2-google-maps'
-import firebase from '../firebaseApp'
+import firebase from '../firebaseConfig'
 
 Vue.use(VueGoogleMaps, {
 	load: {
@@ -115,6 +115,9 @@ export default {
 		infoWindowOpen() {
 			return this.$store.state.infoWindowOpen
 		},
+		userMenuOpen() {
+			return this.$store.state.userMenuOpen
+		},
 		openWindow() {
 			return this.$store.state.openWindow
 		},
@@ -129,10 +132,10 @@ export default {
 	},
 	components: {
 		Omnibox,
+		Omniform: () => import('./Omniform'),
 		InfoWindow: () => import('./InfoWindow'),
-		LoginForm: () => import('./LoginForm'),
-		ReviewForm: () => import('./ReviewForm'),
-		SearchResult: () => import('./SearchResult')
+		SearchResult: () => import('./SearchResult'),
+		UserMenu: () => import('./UserMenu'),
 	},
 	methods: {
 		setHeight(h) {
@@ -157,16 +160,16 @@ export default {
 				}, (error) => {
 					this.isLoading = false;
 					switch (error.code) {
-						case '1':
-						this.errorMessage = 'Failed to get current position. Please enable geolocation or location service';
+						case 1:
+						this.errorMessage = 'Failed to get current position.\nPlease enable geolocation or location service';
 						break;
 
-						case '2':
-						this.errorMessage = 'Failed to get current position due to internal error. Please try again in a few moment';
+						case 2:
+						this.errorMessage = 'Failed to get current position due to internal error.\nPlease try again in a few moment';
 						break;
 
-						case '3':
-						this.errorMessage = 'Failed to get current position due to connection timed out. Please try again in a few moment';
+						case 3:
+						this.errorMessage = 'Failed to get current position due to connection timed out.\nPlease try again in a few moment';
 						break;
 						
 						default:
@@ -185,6 +188,42 @@ export default {
 		panToUser() {
 			if (this.currentPosition) {
 				this.$refs.locationMap.panTo(this.currentPosition)
+			} else {
+				this.popUpMessageOpen = true
+			}
+		},
+		getDirection(payload) {
+			if (this.currentPosition) {
+				this.popUpMessageOpen = true
+				this.isLoading = true
+
+				var directionsService = new google.maps.DirectionsService
+				var directionsDisplay = new google.maps.DirectionsRenderer
+				var renderOptions = {
+					suppressMarkers: true
+				};
+				directionsDisplay.setMap(this.$refs.locationMap.$mapObject)
+				directionsDisplay.setOptions(renderOptions)
+
+				var that = this
+				//google maps API's direction service
+				function calculateAndDisplayRoute(directionsService, directionsDisplay, start, destination) {
+					directionsService.route({
+						origin: start,
+						destination: destination,
+						travelMode: 'DRIVING'
+					}, (response, status) => {
+						if (status === 'OK') {
+							directionsDisplay.setDirections(response)
+							that.popUpMessageOpen = false
+						} else {
+							that.errorMessage = 'Direction request failed.\n' + status
+							that.isLoading = false
+						}
+					})
+				}
+				
+				calculateAndDisplayRoute(directionsService, directionsDisplay, this.currentPosition, payload)
 			} else {
 				this.popUpMessageOpen = true
 			}
@@ -210,7 +249,12 @@ export default {
 	font-family: Roboto, Helvetica;
 	font-size: $size;
 }
-
+@mixin center {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
 .map {
 	display: flex;
 	width: 100%;
@@ -224,10 +268,7 @@ export default {
 		display: inline-block;
 		padding: 15px;
 		position: absolute;
-		top: 50%;
-		left: 50%;
-		margin-right: -50%;
-		transform: translate(-50%, -50%);
+		@include center();
 		width: 300px;
 		height: 210px;
 		z-index: 4;
@@ -256,10 +297,7 @@ export default {
 		}
 		&__loading {
 			@include font-default(black, 17px);
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
+			@include center();
 		}
 	}
 	&__modal {
@@ -276,13 +314,34 @@ export default {
 		@include font-default(black, 9px);
 		position: absolute;
 		right: 15px;
-		bottom: 15px;
-		width: 50px;
-		height: 50px;
+		bottom: 25px;
+		width: 40px;
+		height: 40px;
 		z-index: 1;
 		&:active, &:focus {
 			outline-style: none;
 		}
+		&--position-fixed {
+			&::before {
+				background: url(../assets/gps-fixed-indicator.svg);
+				background-size: 30px;
+				content: '';
+				@include center();
+				width: 30px;
+				height: 30px;
+			}
+		}
+		&--position-not-fix {
+			&::before {
+				background: url(../assets/gps-location-symbol.svg);
+				background-size: 30px;
+				content: '';
+				@include center();
+				width: 30px;
+				height: 30px;	
+			}
+		}
+		
 	}
 }
 </style>

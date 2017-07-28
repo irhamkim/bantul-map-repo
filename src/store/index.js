@@ -8,6 +8,7 @@ let store = new Vuex.Store({
 		user: null,
 		keyword: null,
 		infoWindowOpen: false,
+		userMenuOpen: false,
 		openWindow: null,
 		openForm: null,
 		height: null,
@@ -27,6 +28,12 @@ let store = new Vuex.Store({
 		},
 		closeInfoWindow(state) {
 			state.infoWindowOpen = false
+		},
+		openUserMenu(state) {
+			state.userMenuOpen = true
+		},
+		closeUserMenu(state) {
+			state.userMenuOpen = false
 		},
 		openWindow(state, payload) {
 			state.openWindow = payload

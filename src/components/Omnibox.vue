@@ -8,8 +8,8 @@
 		</div>
 		<button class="floating-menu__flat-button floating-menu__flat-button--search"
 			@click="searchLocation"></button>
-		<button v-if="windowOpen && !searchKeyword" class="floating-menu__flat-button floating-menu__flat-button--cancel"
-			@click="closeWindow"></button>
+		<button v-if="windowOpen" class="floating-menu__flat-button floating-menu__flat-button--cancel"
+			@click="closeWindow(), closeMenu()"></button>
 		<button v-if="!windowOpen && !searchKeyword" class="floating-menu__flat-button floating-menu__flat-button--menu"
 			@click="openMenu">
 		</button>
@@ -20,7 +20,6 @@
 </template>
 
 <script>
-import firebase from '../firebaseApp'
 
 export default {
 	name: 'floatingMenu',
@@ -33,15 +32,8 @@ export default {
 		isLoggedIn() {
 			return this.$store.state.user ? true : false
 		},
-		userDisplayName() {
-			let str = this.$store.state.user.providerData[0].displayName
-
-			let strSub = str.substr(0, str.indexOf(' ') ? str.indexOf(' ') : str.length())
-
-			return strSub.length < 6 ? strSub : strSub.substr(0, 6) + '..'
-		},
 		windowOpen() {
-			return this.$store.state.openWindow ? true : false
+			return this.$store.state.openWindow || this.$store.state.userMenuOpen ? true : false
 		},
 		infoWindowOpen() {
 			return this.$store.state.infoWindowOpen ? true : false
@@ -59,18 +51,11 @@ export default {
 		openLoginForm() {
 			this.$store.commit('openForm', 'loginForm')
 		},
-		logOutUser() {
-			firebase.auth().signOut().then(() => {
-				this.$store.commit('removeUserState')
-			}).catch((error) => {
-
-			})
-		},
 		openMenu() {
-			this.$store.commit('openWindow', 'userMenu')
+			this.$store.commit('openUserMenu')
 		},
 		closeMenu() {
-			this.$store.commit('closeWindow')
+			this.$store.commit('closeUserMenu')
 		},
 		closeSearchResult() {
 			this.searchKeyword = null
