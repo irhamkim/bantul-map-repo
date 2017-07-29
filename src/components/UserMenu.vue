@@ -1,7 +1,7 @@
 <template>
 	<div class="user-menu">
 		<div class="user-menu__header">
-			div.user-menu__image+
+			<div class="user-menu__image"></div>
 		</div>
 		<template v-if="!isLoggedIn">
 			<button class="user-menu__button user-menu__button--login"

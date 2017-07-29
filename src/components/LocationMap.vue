@@ -1,5 +1,5 @@
 <template>
-	<div class="map">
+	<div class="map" :style="styles">
 		<omnibox>
 		</omnibox>
 		<info-window v-if="infoWindowOpen"
@@ -94,7 +94,8 @@ export default {
 		return {
 			styles: {
 				'width': '100%',
-				'z-index': 0
+				'height': '100%',
+				'z-index': '0',
 			},
 			
 			options: {
@@ -139,7 +140,11 @@ export default {
 	},
 	methods: {
 		setHeight(h) {
-			h ? this.styles.height = h +'px' : this.styles.height = '100%'
+			if (h) {
+				this.styles.height = h + 'px'
+			} else {
+				this.styles.height = '100%'
+			}
 		},
 		allowGeolocation() {
 			this.errorMessage = null
@@ -311,6 +316,7 @@ export default {
 		background-color: white;
 		border: none;
 		border-radius: 50%;
+		@include box-shadow;
 		@include font-default(black, 9px);
 		position: absolute;
 		right: 15px;

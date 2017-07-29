@@ -4,36 +4,36 @@
 			class="login-form__loading">
 			<span>Loading...</span>
 		</div>
-		<template v-else>
-			<div class="login-form__header">
-				<h2 class="login-form__title">Login</h2>
-				<button class="login-form__flat-button login-form__flat-button--close"
-					@click="closeLoginForm">X</button>
-				<div class="login-form__error-message"
-					v-show="errorMessage">{{ errorMessage }}</div>
+		<div v-else
+			class="login-form__form-group">	
+			<div class="login-form__input-wrapper">
+				<div class="login-form__label-wrapper">
+					<label class="login-form__label">Email</label>
+				</div>
+				<input class="login-form__input login-form__input--email" type="email" v-model.trim="emailForm"/>
 			</div>
-			<div class="login-form__form">	
-				<div class="login-form__input login-form__input--email">
-					<label>Email </label>:
-					<input type="email" v-model.trim="emailForm"/>
+			<div class="login-form__input-wrapper">
+				<div class="login-form__label-wrapper">
+					<label class="login-form__label">Password</label>
+					<button class="login-form__link login-form__link--forgot"
+						>Forgot password?</button>
 				</div>
-				<div class="login-form__input login-form__input--password">
-					<label>Password </label>:
-					<input type="password" v-model.trim="passwordForm"/>
-				</div>
-				<button class="login-form__button login-form__button--login" 
-					v-on:click="logInUserWithProvider('email')">Login</button>
-				<div class="login-form__link">
-					<router-link to="forgot">Forgot Your Password?</router-link>
-				</div>
-				<div class="login-form__button-group">
-					<button class="login-form__circle-button login-form__button--google"
-						@click="logInUserWithProvider('google')">Google</button>
-					<button class="login-form__circle-button login-form__button--facebook"
-						@click="logInUserWithProvider('facebook')">Facebook</button>
-				</div>
+				<input class="login-form__input login-form__input--password" type="password" v-model.trim="passwordForm"/>
 			</div>
-		</template>
+			<button class="login-form__button login-form__button--login" 
+				v-on:click="logInUserWithProvider('email')">Login</button>
+			<button class="login-form__link login-form__link--register"
+				@click="openRegisterForm">Register a new account</button>
+			<div class="login-form__divider">
+				<span>Login with</span>
+			</div>
+			<div class="login-form__button-group">
+				<button class="login-form__circle-button login-form__circle-button--google"
+					@click="logInUserWithProvider('google')">Google</button>
+				<button class="login-form__circle-button login-form__circle-button--facebook"
+					@click="logInUserWithProvider('facebook')">Facebook</button>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -76,111 +76,149 @@
 		},
 		closeLoginForm() {
 			this.$store.commit('closeForm')
-		}
+		},
+		openRegisterForm() {
+			this.$store.commit('openForm', 'registerForm')
+		},
 	}	
   }
 </script>
 
 <style lang="scss">
-	.login-form {
-		background-color: white;
-		box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
-		font-family: Roboto, Helvetica;
-		font-size: 17px;
-		padding: 15px;
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: 500px;
-		height: 400px;
-		z-index: 5;
-		&__loading {
-			background-color: white;
-			position: relative;
-			width: 100%;
-			height: 100%;
-			z-index: 3;
-			span {
-				position: absolute;
-				top: 50%;
-				left: 50%;
-				transform: translate(-50%, -50%);
-			}
-		}
-		&__header {
-			width: 100%;
-			height: 25%;
-			top: 15px;
-		}
-		&__title {
-			font-size: 21px;
-			margin: 0;
-			position: absolute;
-			top: 55px;
-			left: 50%;
-			transform: translate(-50%, 0);
-		}
-		&__flat-button {
-			background-color: white;
-			border: none;
-			color: gray;
-			&:focus {
-				outline-style: none;
-			}
-			&--close {
-				position: absolute;
-				right: 15px;
-			}
-		}
-		&__form {
-			padding-top: 15px;
-		}
-		&__input {
-			margin: 10px 0;
-			label {
-				display: inline-block;
-				width: 100px;
-			}
-			input {
-				width: 300px;
-			}
-			&--email {}
-			&--password {}
-		}
-		&__button {
-			background-color: teal;
-			border: none;
-			color: white;
-			margin-left: 50%;
-			transform: translate(-50%, 0);
-			width: 70px;
-			height: 35px;
-		}
-		&__link {
-			display: inline-block;
-			margin-top: 10px;
-			margin-bottom: 10px;
-			margin-left: 50%;
-			transform: translate(-50%, 0);
-		}
-		&__button-group {
-			position: absolute;
-			left: 50%;
-			transform: translate(-50%, 0);
-		}
-		&__circle-button {
-			background-color: white;
-			border: 1px solid teal;
-			border-radius: 50%;
-			width: 70px;
-			height: 70px;
-			&:focus {
-				outline-style: none;
-			}
-			&--google {
+@mixin box-shadow {
+	box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
+}
+@mixin font-default($color, $size) {
+	color: $color;
+	font-family: Roboto, Helvetica;
+	font-size: $size;
+}
+@mixin center {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
 
-			}
+.login-form {
+	position: absolute;
+	top: 40%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 80%;
+	height: 220px;
+	&__loading {
+		background-color: white;
+		position: relative;
+		width: 100%;
+		height: 100%;
+		z-index: 3;
+		span {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
 		}
 	}
+	&__title {
+		font-size: 21px;
+		margin: 0;
+		position: absolute;
+		top: 55px;
+		left: 50%;
+		transform: translate(-50%, 0);
+	}
+	&__form-group {
+	}
+	&__input-wrapper {
+		margin: 15px 0;
+		&--email {}
+		&--password {}
+	}
+	&__input {
+		box-sizing: border-box;
+		width: 100%;
+	}
+	&__label-wrapper {
+		display: flex;
+	}
+	&__label {
+		flex: 1 1 auto;
+		@include font-default(black, 15px);
+		width: 80px;
+	}
+	&__button {
+		background-color: #00b27c;
+		border: none;
+		@include box-shadow;
+		box-sizing: border-box;
+		@include font-default(white, 15px);
+		margin: 0 0 15px 50%;
+		transform: translate(-50%, 0);
+		width: 70px;
+		height: 35px;
+		&:focus {
+			outline-style: none;
+		}
+	}
+	&__link {
+		background-color: inherit;
+		border: none;
+		box-sizing: border-box;
+		@include font-default(blue, 15px);
+		padding: 0;
+		text-align: right;
+		&:focus {
+			outline-style: none;
+		}
+		&--register {
+			margin: 0 0 15px 50%;
+			transform: translate(-50%, 0);
+		}
+		&--forgot {
+			flex: 1 1 auto;
+		}
+	}
+	&__divider {
+		background-color: white;
+		box-sizing: border-box;
+		@include font-default(#cccccc, 15px);
+		margin-left: 50%;
+		position: relative;
+		text-align: center;
+		transform: translate(-50%, 0);
+		span {
+			background-color: white;
+			padding: 0 9px;
+		}
+		&::before {
+			content: '';
+			border-bottom: 2px solid #cccccc;
+			@include center;
+			width: 100%;
+			z-index: -1;
+		}
+	}
+	&__button-group {
+		box-sizing: border-box;
+		margin: 15px 0;
+		position: absolute;
+		left: 50%;
+		transform: translate(-50%, 0);
+	}
+	&__circle-button {
+		background-color: white;
+		border: 1px solid #00b27c;
+		border-radius: 50%;
+		width: 70px;
+		height: 70px;
+		&:focus {
+			outline-style: none;
+		}
+		&--google {
+		}
+		&--facebook {
+		}
+	}
+}
 </style>

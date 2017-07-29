@@ -338,16 +338,14 @@ export default {
 	&__flat-button {
 		background-color: white;
 		border: none;
-		@include font-default(#00b27c, 17px);
 		&:focus {
 			outline-style: none;
 		}
 		&--bottom {
-			position: absolute;
-			bottom: 5px;
-			left: 50%;
-			transform: translate(-50%, 0);
+			display: block;
+			@include font-default(#00b27c, 15px);
 			width: 100%;
+			height: 40px;
 		}
 	}
 }
