@@ -7,6 +7,7 @@
 			<div class="register-form__input-wrapper">
 				<div class="register-form__label-wrapper">
 					<label class="register-form__label">Email</label>
+					<div class="register-form__error-message">{{ errorMessage }}</div>
 				</div>
 				<input class="register-form__input" type="email" v-model.trim="emailForm"/>
 			</div>
@@ -48,30 +49,40 @@ export default {
 			passwordForm: '',
 			reconfirmPassword: false,
 			confirmPasswordForm: '',
-			registerError: ''
+			errorMessage: ''
 		}
 	},
 	methods: {
 		registerUser: function() {
+			this.errorMessage = null
 			if (this.emailForm && this.usernameForm && this.passwordForm) {	
 				if (this.passwordForm.length >= 6) {
 					if (this.passwordForm === this.confirmPasswordForm) { //check if password form value === confirm password form value
 						this.loading = true;
-						firebase.auth().createUserWithEmailAndPassword(this.emailForm, this.passwordForm).then(function() {
-						}.bind(this)).catch(function (error) {
-							this.registerError = error.message;
+						firebase.auth().createUserWithEmailAndPassword(this.emailForm, this.passwordForm).then(() => {
+							firebase.auth().onAuthStateChanged((user) => {
+								if (user) {
+									user.updateProfile({
+										displayName: this.usernameForm
+									})
+								}
+							})
+						}).catch((error) => {
+							this.errorMessage = error.message;
 							this.loading = false;
-						}.bind(this));
+						});
 						
 					} else { //if password different, warn user to enter correct password
-						this.reconfirmPassword =  true;
+						this.errorMessage =  'Password you entered didn\'t match';
 					}
 				} else {
-					this.registerError = 'Password has to be 6 characters or more';
+					this.errorMessage = 'Password has to be 6 characters or more';
 				}
 			} else {
-				this.registerError = 'Email, username, and password can\'t be empty';
+				this.errorMessage = 'Email, username, and password can\'t be empty';
 			}
+
+
 		},
 		openLoginForm() {
 			this.$store.commit('openForm', 'loginForm')
@@ -105,6 +116,7 @@ export default {
 	height: 220px;
 	&__loading {
 		background-color: white;
+		@include font-default(black, 18px);
 		position: relative;
 		width: 100%;
 		height: 100%;
@@ -132,6 +144,11 @@ export default {
 		flex: 1 1 auto;
 		@include font-default(black, 15px);
 		width: 80px;
+	}
+	&__error-message {
+		flex: 1 1 auto;
+		@include font-default(red, 15px);
+		text-align: right;
 	}
 	&__button {
 		background-color: #00b27c;

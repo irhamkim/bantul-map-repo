@@ -5,10 +5,11 @@
 			<span>Loading...</span>
 		</div>
 		<div v-else
-			class="login-form__form-group">	
+			class="login-form__form-group">
 			<div class="login-form__input-wrapper">
 				<div class="login-form__label-wrapper">
 					<label class="login-form__label">Email</label>
+					<div class="login-form__error-message">{{ errorMessage }}</div>
 				</div>
 				<input class="login-form__input login-form__input--email" type="email" v-model.trim="emailForm"/>
 			</div>
@@ -109,6 +110,7 @@
 	height: 220px;
 	&__loading {
 		background-color: white;
+		@include font-default(black, 18px);
 		position: relative;
 		width: 100%;
 		height: 100%;
@@ -146,6 +148,11 @@
 		flex: 1 1 auto;
 		@include font-default(black, 15px);
 		width: 80px;
+	}
+	&__error-message {
+		flex: 1 1 auto;
+		@include font-default(red, 15px);
+		text-align: right;
 	}
 	&__button {
 		background-color: #00b27c;
