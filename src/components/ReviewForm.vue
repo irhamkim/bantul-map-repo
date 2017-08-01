@@ -20,7 +20,8 @@
 	</div>
 </template>
 
-<script>import firebase from '../firebaseConfig'
+<script>
+import firebase from '../firebaseConfig'
 
 export default {
 	name: 'reviewForm',
@@ -105,62 +106,62 @@ export default {
 	font-size: $size;
 }
 
-	.review-form {
+.review-form {
+	position: absolute;
+	top: 55%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 350px;
+	height: 220px;
+	&::before {
+		content: 'Write a review';
+		@include font-default(black, 17px);
+		height: 25px;
+	}
+	&::after {
+		content: '/160';
+		@include font-default(black, 17px);
 		position: absolute;
-		top: 55%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: 350px;
-		height: 220px;
-		&::before {
-			content: 'Write a review';
-			@include font-default(black, 17px);
-			height: 25px;
-		}
-		&::after {
-			content: '/160';
-			@include font-default(black, 17px);
-			position: absolute;
-			top: 0;
-			right: 0;
-		}
-		&__character-limit {
-			position: absolute;
-			@include font-default(black, 17px);
-			top: 0;
-			right: 37px;
-			&--is-on-limit {
-				@include font-default(red, 17px);
-			}
-		}
-		&__input {
-			background-color: rgba(100, 100, 100, 0.25);
-			border: 2px solid #00b27c;
-			box-sizing: border-box;
-			@include font-default(black, 17px);
-			padding: 2px;
-			resize: none;
-			width: 350px;
-			height: 150px;
-			&:focus {
-				outline-style: none;
-			}
-		}
-		&__float-button {
-			background-color: #00b27c;
-			border: none;
-			@include box-shadow;
-			box-sizing: border-box;
-			color: white;
-			@include font-default(white, 17px);
-			padding: 5px;
-			position: absolute;
-			right: 0;
-			bottom: 0;
-			&:focus {
-				outline-style: none;
-			}
+		top: 0;
+		right: 0;
+	}
+	&__character-limit {
+		position: absolute;
+		@include font-default(black, 17px);
+		top: 0;
+		right: 37px;
+		&--is-on-limit {
+			@include font-default(red, 17px);
 		}
 	}
+	&__input {
+		background-color: rgba(100, 100, 100, 0.25);
+		border: 2px solid #00b27c;
+		box-sizing: border-box;
+		@include font-default(black, 17px);
+		padding: 2px;
+		resize: none;
+		width: 350px;
+		height: 150px;
+		&:focus {
+			outline-style: none;
+	}
+	}
+	&__float-button {
+		background-color: #00b27c;
+		border: none;
+		@include box-shadow;
+		box-sizing: border-box;
+		color: white;
+		@include font-default(white, 17px);
+		padding: 5px;
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		&:focus {
+			outline-style: none;
+		}
+	}
+}
 
 </style>

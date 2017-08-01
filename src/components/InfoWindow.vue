@@ -1,62 +1,72 @@
 <template>
-	<div class="info-tab">
-		<div class="info-tab__head">
-			<div class="info-tab__head__section">
-				<div class="info-tab__head__title">
-					{{ locationData.name }}
+	<div class="wrapper">
+		<div v-bar="{el1Class: 'el1', el2Class: 'info-tab'}"
+			style="width: 430px;">
+			<div>
+				<div class="info-tab__head">
+					<div class="info-tab__head__section">
+						<div class="info-tab__head__title">
+							{{ locationData.name }}
+						</div>
+						<button class="info-tab__head__flat-button info-tab__head__flat-button--close"
+							@click="closeInfoWindow">
+						</button>
+					</div>
+					<div class="info-tab__head__image">
+						This is a placeholder image for location {{ this.$route.query.location }}
+					</div>
+					<div class="info-tab__head__section info-tab__head__section--bottom">
+						<div class="info-tab__head__title">
+							{{ locationData.address }}
+						</div>
+					</div>
+					<button class="info-tab__direction-button"
+						@click="getDirection">
+					</button>
 				</div>
-				<button class="info-tab__head__flat-button info-tab__head__flat-button--close"
-					@click="closeInfoWindow">
+				<div class="info-tab__reviews">
+					<div v-if="!isLoggedIn"
+						class="info-tab__reviews__section">
+						<button class="info-tab__float-button info-tab__float-button--login"
+							@click="openLoginForm">Login</button>
+					</div>
+					<div v-if="isLoggedIn && !currentUserReviewed"
+						class="info-tab__reviews__section">
+						<button class="info-tab__float-button info-tab__float-button--write"
+							@click="openReviewForm">Write Review</button>
+					</div>
+					<div v-if="currentUserReviewed"
+						class="info-tab__reviews__section">
+						<div class="info-tab__reviews__user-review">{{ userReview.content }}</div>
+						<button class="info-tab__float-button info-tab__float-button--edit"
+							@click="openReviewForm">Edit</button>
+						<button class="info-tab__float-button info-tab__float-button--delete"
+							@click="deleteReview">Delete</button>
+					</div>
+					<div v-for="(review, index) in orderedReviews" :key="index"
+						class="info-tab__review-item">
+						<span class="info-tab__review-item__user">{{ review.submittedBy }}</span>
+						<span class="info-tab__review-item__content">{{ review.content }}</span>
+						<span class="info-tab__review-item__time">{{ submitTime(review.submitTime) }}</span>
+					</div>
+				</div>
+				<button class="info-tab__flat-button info-tab__flat-button--bottom"
+					@click="openReviewWindow">
+					More Reviews
 				</button>
 			</div>
-			<div class="info-tab__head__image">
-				This is a placeholder image for location {{ this.$route.query.location }}
-			</div>
-			<div class="info-tab__head__section info-tab__head__section--bottom">
-				<div class="info-tab__head__title">
-					{{ locationData.address }}
-				</div>
-			</div>
-			<button class="info-tab__direction-button"
-				@click="getDirection">
-			</button>
 		</div>
-		<div class="info-tab__reviews">
-			<div v-if="!isLoggedIn"
-				class="info-tab__reviews__section">
-				<button class="info-tab__float-button info-tab__float-button--login"
-					@click="openLoginForm">Login</button>
-			</div>
-			<div v-if="isLoggedIn && !currentUserReviewed"
-				class="info-tab__reviews__section">
-				<button class="info-tab__float-button info-tab__float-button--write"
-					@click="openReviewForm">Write Review</button>
-			</div>
-			<div v-if="currentUserReviewed"
-				class="info-tab__reviews__section">
-				<div class="info-tab__reviews__user-review">{{ userReview.content }}</div>
-				<button class="info-tab__float-button info-tab__float-button--edit"
-					@click="openReviewForm">Edit</button>
-				<button class="info-tab__float-button info-tab__float-button--delete"
-					@click="deleteReview">Delete</button>
-			</div>
-			<div v-for="(review, index) in orderedReviews" :key="index"
-				class="info-tab__review-item">
-				<span class="info-tab__review-item__user">{{ review.submittedBy }}</span>
-				<span class="info-tab__review-item__content">{{ review.content }}</span>
-				<span class="info-tab__review-item__time">{{ submitTime(review.submitTime) }}</span>
-			</div>
-		</div>
-		<button class="info-tab__flat-button info-tab__flat-button--bottom"
-			@click="openReviewWindow">
-			More Reviews
-		</button>
 	</div>
 </template>
 
 <script>
 import * as moment from 'moment'
 import firebase from '../firebaseConfig'
+import Vue from 'vue'
+import Vuebar from 'vuebar'
+
+Vue.use(Vuebar)
+
 export default {
 		name: 'infoWindow',
 		beforeMount() {
@@ -64,20 +74,12 @@ export default {
 				this.$bindAsObject('userReview', firebase.database().ref('users').child(this.$store.state.user.uid).child('reviews').child(this.$route.query.location))
 			}
 		},
-		mounted() {
-			let h = this.$el.clientHeight
-			this.$emit('set-height', h)
-		},
-		updated() {
-			let h = this.$el.clientHeight
-			this.$emit('set-height', h)
-		},
-		destroyed() {
-			this.$emit('set-height', null)
-		},
 		data() {
 			return {
-				locationReviews: []
+				start: false,
+				active: false,
+				end: false,
+				locationReviews: [],
 			}
 		},
 		firebase() {
@@ -93,11 +95,11 @@ export default {
 		},
 		computed: {
 			orderedReviews() {
-				let arr = this.locationReviews.sort((a, b) => {
+				let r = this.locationReviews.sort((a, b) => {
 					return b.submitTime - a.submitTime
 				})
 
-				return arr.slice(0,2)
+				return r.slice(0, 2)
 			},
 			isLoggedIn() {
 				return this.$store.state.user ? true : false
@@ -156,11 +158,51 @@ export default {
 	font-size: $size;
 }
 
+/* vuebar styles */
+@mixin gray($o) {
+	background-color: rgba(0, 178, 124, $o)
+}
+
+.wrapper {
+	position: absolute !important;
+	height: 100vh;
+	z-index: 4;
+	@media (max-width : 429px) {
+		width: 100%;
+	}
+}
+
+.el1 {
+	position: absolute !important;
+	height: 100vh;
+	z-index: 4;
+	@media (max-width : 429px) {
+		width: 100%;
+	}
+}
+/**/
+
+/* List Transition */
+.list-fade-enter-active, .list-fade-leave-active {
+	transition: all 0.3s;
+}
+
+.list-fade-enter, .list-fade-leave-to {
+	opacity: 0;
+	transform: translateY(50px);
+}
+
+.list-fade-enter-to, .list-fade-leave {
+	opacity: 1;
+}
+
+/**/
+
 .info-tab {
 	background-color: white;
-	position: absolute;
+	position: relative;
+	bottom: 0;
 	width: 430px;
-	min-height: 100vh;
 	z-index: 4;
 	@media (max-width : 429px) {
 		width: 100%;

@@ -1,44 +1,50 @@
 <template>
 	<div class="register-form">
-		<div v-if="loading" class="register-form__loading">
-			<span>Loading</span>
-		</div>
-		<div class="register-form__form-group">
-			<div class="register-form__input-wrapper">
-				<div class="register-form__label-wrapper">
-					<label class="register-form__label">Email</label>
-					<div class="register-form__error-message">{{ errorMessage }}</div>
-				</div>
-				<input class="register-form__input" type="email" v-model.trim="emailForm"/>
+		<transition name="fade">
+			<div v-if="loading" class="register-form__loading">
+				<span>Loading</span>
 			</div>
-			<div class="register-form__input-wrapper">
-				<div class="register-form__label-wrapper">
-					<label class="register-form__label">Username</label>
+		</transition>
+		<transition name="fade">
+			<div v-if="!loading" class="register-form__form-group">
+				<div class="register-form__input-wrapper">
+					<div class="register-form__label-wrapper">
+						<label class="register-form__label">Email</label>
+						<div class="register-form__error-message">{{ errorMessage }}</div>
+					</div>
+					<input class="register-form__input" type="email" v-model.trim="emailForm"/>
 				</div>
-				<input class="register-form__input" type="text" v-model.trim="usernameForm"/>
-			</div>
-			<div class="register-form__input-wrapper">
-				<div class="register-form__label-wrapper">
-					<label class="register-form__label">Password</label>
+				<div class="register-form__input-wrapper">
+					<div class="register-form__label-wrapper">
+						<label class="register-form__label">Username</label>
+					</div>
+					<input class="register-form__input" type="text" v-model.trim="usernameForm"/>
 				</div>
-				<input class="register-form__input" type="password" v-model.trim="passwordForm"/>
-			</div>
-			<div class="register-form__input-wrapper">
-				<div class="register-form__label-wrapper">
-					<label class="register-form__label">Confirm Password</label>
+				<div class="register-form__input-wrapper">
+					<div class="register-form__label-wrapper">
+						<label class="register-form__label">Password</label>
+					</div>
+					<input class="register-form__input" type="password" v-model.trim="passwordForm"/>
 				</div>
-				<input class="register-form__input" type="password" v-model.trim="confirmPasswordForm"/>
+				<div class="register-form__input-wrapper">
+					<div class="register-form__label-wrapper">
+						<label class="register-form__label">Confirm Password</label>
+					</div>
+					<input class="register-form__input" type="password" v-model.trim="confirmPasswordForm"/>
+				</div>
+				<button class="register-form__button register-form__button--register" 
+					v-on:click="registerUser">Register</button>
+				<button class="register-form__link register-form__link--login"
+					@click="openLoginForm">Login with existing account</button>
 			</div>
-			<button class="register-form__button register-form__button--register" 
-				v-on:click="registerUser">Register</button>
-			<button class="register-form__link register-form__link--login"
-				@click="openLoginForm">Login with existing account</button>
-		</div>
+		</transition>
 	</div>
 </template>
 
 <script>
 import firebase from '../firebaseConfig'
+import errorMessageHandler from '../helper'
+
 export default {
 	name: 'registerForm',
 	data: function () {
@@ -65,10 +71,12 @@ export default {
 									user.updateProfile({
 										displayName: this.usernameForm
 									})
+									this.$store.commit('setUserState', user)
 								}
+								this.$store.commit('closeForm');
 							})
 						}).catch((error) => {
-							this.errorMessage = error.message;
+							this.errorMessage = errorMessageHandler(error.code)
 							this.loading = false;
 						});
 						
@@ -108,12 +116,8 @@ export default {
 }
 
 .register-form {
-	position: absolute;
-	top: 40%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	width: 80%;
-	height: 220px;
+	width: 100%;
+	height: 100%;
 	&__loading {
 		background-color: white;
 		@include font-default(black, 18px);
@@ -127,6 +131,14 @@ export default {
 			left: 50%;
 			transform: translate(-50%, -50%);
 		}
+	}
+	&__form-group {
+		position: absolute;
+		top: 40%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 80%;
+		height: 220px;
 	}
 	&__input-wrapper {
 		margin: 15px 0;

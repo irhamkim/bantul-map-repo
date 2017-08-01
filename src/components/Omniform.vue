@@ -2,14 +2,24 @@
 	<div class="omniform">
 		<button class="omniform__flat-button omniform__flat-button--close"
 			@click="closeForm"></button>
-		<login-form v-if="openForm === 'loginForm'"></login-form>
-		<register-form v-if="openForm === 'registerForm'"></register-form>
-		<review-form v-if="openForm === 'reviewForm'"></review-form>
+		<transition name="fade">
+			<login-form v-if="openForm === 'loginForm'"></login-form>
+		</transition>
+		<transition name="fade">
+			<forgot-password v-if="openForm === 'forgotPasswordForm'"></forgot-password>
+		</transition>
+		<transition name="fade">
+			<register-form v-if="openForm === 'registerForm'"></register-form>
+		</transition>
+		<transition name="fade">
+			<review-form v-if="openForm === 'reviewForm'"></review-form>
+		</transition>
 	</div>
 </template>
 
 <script>
 import LoginForm from './LoginForm'
+import ForgotPasswordForm from './ForgotPassword'
 import RegisterForm from './RegisterForm'
 import ReviewForm from './ReviewForm'
 
@@ -22,6 +32,7 @@ export default {
 	},
 	components: {
 		LoginForm: () => import('./LoginForm'),
+		ForgotPassword: () => import('./ForgotPassword'),
 		RegisterForm: () => import('./RegisterForm'),
 		ReviewForm: () => import('./ReviewForm'),
 	},
@@ -47,6 +58,7 @@ export default {
 	height: 400px;
 	z-index: 5;
 	@media (max-width: 429px) {
+		border-radius: 0;
 		box-shadow: none;
 		width: 100%;
 		min-height: 100%;

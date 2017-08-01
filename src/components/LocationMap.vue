@@ -1,38 +1,53 @@
 <template>
-	<div class="map" :style="styles">
+	<div class="map">
 		<omnibox>
 		</omnibox>
-		<info-window v-if="infoWindowOpen"
-			@set-height="setHeight"
-			@get-direction="getDirection">
-		</info-window>
-		<search-result v-if="openWindow === 'searchResult'">
-		</search-result>
-		<user-menu v-if="userMenuOpen"></user-menu>
-		<omniform v-if="openForm"></omniform>
-		<div v-if="popUpMessageOpen" class="map__popup-message">
-			<template v-if="!errorMessage && !isLoading">
-				<span class="map__popup-message__head">
-					Allow us to use geolocation to determine your current location?
-					Geolocation is needed to use most of our features.
-				</span><br>
-				<span class="map__popup-message__note">
-					*We do not store any sensitive information.
-				</span><br>
-				<button @click="denyGeolocation" class="map__popup-message__button map__popup-message__button--left">Cancel</button>
-				<button @click="allowGeolocation" class="map__popup-message__button map__popup-message__button--right">OK</button>
-			</template>
-			<template v-if="isLoading && !errorMessage">
-				<span class="map__popup-message__loading">Loading...</span>
-			</template>
-			<template v-if="errorMessage && !isLoading">
-				<span class="map__popup-message__head">
-					{{ errorMessage }}
-				</span>
-				<button @click="denyGeolocation" class="map__popup-message__button map__popup-message__button--left">Cancel</button>
-				<button @click="allowGeolocation" class="map__popup-message__button map__popup-message__button--right">Retry</button>
-			</template>
-		</div>
+		<transition name="fade">
+			<info-window v-if="infoWindowOpen"
+				@set-height="setHeight"
+				@get-direction="getDirection">
+			</info-window>
+		</transition>
+		<transition name="fade">
+			<search-result v-if="openWindow === 'searchResult'"></search-result>
+		</transition>
+		<transition name="fade">
+			<user-menu v-if="userMenuOpen"></user-menu>
+		</transition>
+		<transition name="fade">
+			<omniform v-if="openForm"></omniform>
+		</transition>
+		<transition name="fade">
+			<div v-if="popUpMessageOpen" class="map__popup-message">
+				<transition name="fade">
+					<div v-if="!errorMessage && !isLoading">
+						<span class="map__popup-message__head">
+							Allow us to use geolocation to determine your current location?
+							Geolocation is needed to use most of our features.
+						</span><br>
+						<span class="map__popup-message__note">
+							*We do not store any sensitive information.
+						</span><br>
+						<button @click="denyGeolocation" class="map__popup-message__button map__popup-message__button--left">Cancel</button>
+						<button @click="allowGeolocation" class="map__popup-message__button map__popup-message__button--right">OK</button>
+					</div>
+				</transition>
+				<transition name="fade">
+					<div v-if="isLoading && !errorMessage">
+						<span class="map__popup-message__loading">Loading...</span>
+					</div>
+				</transition>
+				<transition name="fade">
+					<div v-if="errorMessage && !isLoading">
+						<span class="map__popup-message__head">
+							{{ errorMessage }}
+						</span>
+						<button @click="denyGeolocation" class="map__popup-message__button map__popup-message__button--left">Cancel</button>
+						<button @click="allowGeolocation" class="map__popup-message__button map__popup-message__button--right">Retry</button>
+					</div>
+				</transition>
+			</div>
+		</transition>
 		<button class="map__circle-button"
 			:class="{ 'map__circle-button--position-fixed': currentPosition, 'map__circle-button--position-not-fix': !currentPosition }"
 			@click="panToUser">
@@ -97,7 +112,6 @@ export default {
 				'height': '100%',
 				'z-index': '0',
 			},
-			
 			options: {
 				disableDefaultUI: true
 			},
@@ -246,6 +260,7 @@ export default {
 </script>
 
 <style lang="scss">
+/* Mixins */
 @mixin box-shadow {
 	box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 }
@@ -260,11 +275,25 @@ export default {
 	left: 50%;
 	transform: translate(-50%, -50%);
 }
+/**/
+
+/* Transition */
+.fade-enter-active, .fade-leave-active {
+	transition: opacity 0.3s;
+}
+.fade-enter, .fade-leave-to {
+	opacity: 0;
+}
+.fade-enter-to, .fade-leave {
+	opacity: 1;
+}
+/**/
+
 .map {
-	display: flex;
-	width: 100%;
-	height: 100%;
-	position: absolute;
+	width: 100vw;
+	height: 100vh;
+	overflow: hidden;
+	position: relative;
 	&__popup-message {
 		background-color: white;
 		border-radius: 5px;

@@ -1,45 +1,51 @@
 <template>
 	<div class="login-form">
-		<div v-if="loading"
-			class="login-form__loading">
-			<span>Loading...</span>
-		</div>
-		<div v-else
-			class="login-form__form-group">
-			<div class="login-form__input-wrapper">
-				<div class="login-form__label-wrapper">
-					<label class="login-form__label">Email</label>
-					<div class="login-form__error-message">{{ errorMessage }}</div>
+		<transition name="fade">
+			<div v-if="loading"
+				class="login-form__loading">
+				<span>Loading...</span>
+			</div>
+		</transition>
+		<transition name="fade">
+			<div v-if="!loading"
+				class="login-form__form-group">
+				<div class="login-form__input-wrapper">
+					<div class="login-form__label-wrapper">
+						<label class="login-form__label">Email</label>
+						<div class="login-form__error-message">{{ errorMessage }}</div>
+					</div>
+					<input class="login-form__input login-form__input--email" type="email" v-model.trim="emailForm"/>
 				</div>
-				<input class="login-form__input login-form__input--email" type="email" v-model.trim="emailForm"/>
-			</div>
-			<div class="login-form__input-wrapper">
-				<div class="login-form__label-wrapper">
-					<label class="login-form__label">Password</label>
-					<button class="login-form__link login-form__link--forgot"
-						>Forgot password?</button>
+				<div class="login-form__input-wrapper">
+					<div class="login-form__label-wrapper">
+						<label class="login-form__label">Password</label>
+						<button class="login-form__link login-form__link--forgot"
+							@click="openForgotPasswordForm">Forgot password?</button>
+					</div>
+					<input class="login-form__input login-form__input--password" type="password" v-model.trim="passwordForm"/>
 				</div>
-				<input class="login-form__input login-form__input--password" type="password" v-model.trim="passwordForm"/>
+				<button class="login-form__button login-form__button--login" 
+					v-on:click="logInUserWithProvider('email')">Login</button>
+				<button class="login-form__link login-form__link--register"
+					@click="openRegisterForm">Register a new account</button>
+				<div class="login-form__divider">
+					<span>Login with</span>
+				</div>
+				<div class="login-form__button-group">
+					<button class="login-form__circle-button login-form__circle-button--google"
+						@click="logInUserWithProvider('google')">Google</button>
+					<button class="login-form__circle-button login-form__circle-button--facebook"
+						@click="logInUserWithProvider('facebook')">Facebook</button>
+				</div>
 			</div>
-			<button class="login-form__button login-form__button--login" 
-				v-on:click="logInUserWithProvider('email')">Login</button>
-			<button class="login-form__link login-form__link--register"
-				@click="openRegisterForm">Register a new account</button>
-			<div class="login-form__divider">
-				<span>Login with</span>
-			</div>
-			<div class="login-form__button-group">
-				<button class="login-form__circle-button login-form__circle-button--google"
-					@click="logInUserWithProvider('google')">Google</button>
-				<button class="login-form__circle-button login-form__circle-button--facebook"
-					@click="logInUserWithProvider('facebook')">Facebook</button>
-			</div>
-		</div>
+		</transition>
 	</div>
 </template>
 
 <script>
   import firebase from '../firebaseConfig'
+  import errorMessageHandler from '../helper'
+
   export default {
 	name: 'loginForm',
 	data: function () {
@@ -54,10 +60,13 @@
 		logInUserWithEmail: function() {
 			if (this.emailForm && this.passwordForm) {
 				this.loading = true;
-				firebase.auth().signInWithEmailAndPassword(this.emailForm, this.passwordForm).catch(function (error) {
-					this.errorMessage = error.message;
+				
+				firebase.auth().signInWithEmailAndPassword(this.emailForm, this.passwordForm).then(() => {
+					this.$store.commit('closeForm')
+				}).catch((error) => {
+					this.errorMessage = errorMessageHandler(error.code)
 					this.loading = false;
-				}.bind(this));
+				});
 			} else {
 				this.errorMessage = 'Email and password can\'t be empty';
 			}
@@ -81,6 +90,9 @@
 		openRegisterForm() {
 			this.$store.commit('openForm', 'registerForm')
 		},
+		openForgotPasswordForm() {
+			this.$store.commit('openForm', 'forgotPasswordForm')
+		},
 	}	
   }
 </script>
@@ -102,12 +114,8 @@
 }
 
 .login-form {
-	position: absolute;
-	top: 40%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	width: 80%;
-	height: 220px;
+	width: 100%;
+	height: 100%;
 	&__loading {
 		background-color: white;
 		@include font-default(black, 18px);
@@ -131,6 +139,12 @@
 		transform: translate(-50%, 0);
 	}
 	&__form-group {
+		position: absolute;
+		top: 40%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 80%;
+		height: 220px;
 	}
 	&__input-wrapper {
 		margin: 15px 0;
