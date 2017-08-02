@@ -98,8 +98,11 @@ export default {
 		}
 	}
 	&__message {
+		@include font-default(black, 15px);
 		@include center;
-		z-index: 3;
+	}
+	&__email {
+		@include font-default(blue, 15px);
 	}
 	&__form-group {
 		position: absolute;
