@@ -61,35 +61,47 @@ export default {
 	methods: {
 		registerUser: function() {
 			this.errorMessage = null
-			if (this.emailForm && this.usernameForm && this.passwordForm) {	
-				if (this.passwordForm.length >= 6) {
-					if (this.passwordForm === this.confirmPasswordForm) { //check if password form value === confirm password form value
-						this.loading = true;
-						firebase.auth().createUserWithEmailAndPassword(this.emailForm, this.passwordForm).then(() => {
-							firebase.auth().onAuthStateChanged((user) => {
-								if (user) {
-									user.updateProfile({
-										displayName: this.usernameForm
-									})
-									this.$store.commit('setUserState', user)
-								}
-								this.$store.commit('closeForm');
-							})
-						}).catch((error) => {
-							this.errorMessage = errorMessageHandler(error.code)
-							this.loading = false;
-						});
-						
-					} else { //if password different, warn user to enter correct password
-						this.errorMessage =  'Password you entered didn\'t match';
-					}
-				} else {
-					this.errorMessage = 'Password has to be 6 characters or more';
-				}
-			} else {
-				this.errorMessage = 'Email, username, and password can\'t be empty';
-			}
 
+			if (this.validateForm()) {	
+				this.loading = true;
+
+				firebase.auth().createUserWithEmailAndPassword(this.emailForm, this.passwordForm).then(() => {
+					firebase.auth().onAuthStateChanged((user) => {
+						if (user) {
+							user.updateProfile({
+								displayName: this.usernameForm
+							})
+							this.$store.commit('setUserState', user)
+						}
+						this.$store.commit('closeForm');
+					})
+				}).catch((error) => {
+					this.errorMessage = errorMessageHandler(error.code)
+					this.loading = false;
+				});
+
+			}
+		},
+		validateForm() {
+			if (!this.emailForm || !this.usernameForm || !this.passwordForm) {	
+				this.errorMessage = 'Email, username, and password can\'t be empty'
+				return false
+
+			} else if (this.usernameForm.length > 10) {
+			 	this.errorMessage = 'Username can\'t be longer than 10 characters'
+			 	return false
+
+			} else if (this.passwordForm.length < 6) {
+				this.errorMessage = 'Password has to be 6 characters or more'
+				return false
+
+			} else if (this.passwordForm !== this.confirmPasswordForm) {
+				this.errorMessage =  'Password you entered didn\'t match'
+				return false
+
+			} else {
+				return true
+			}
 
 		},
 		openLoginForm() {

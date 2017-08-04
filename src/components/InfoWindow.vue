@@ -73,6 +73,9 @@ export default {
 			if (this.$store.state.user) {
 				this.$bindAsObject('userReview', firebase.database().ref('users').child(this.$store.state.user.uid).child('reviews').child(this.$route.query.location))
 			}
+			if (this.$route.query.location) {
+				this.$bindAsObject('locationData', firebase.database().ref('locations').child(this.$route.query.location))
+			}
 		},
 		data() {
 			return {
@@ -143,6 +146,7 @@ export default {
 			},
 			closeInfoWindow() {
 				this.$store.commit('closeInfoWindow')
+				this.$router.push({ query: '' })
 			}
 		}
 }
@@ -210,7 +214,7 @@ export default {
 	&__head {
 		position: relative;
 		width: 100%;
-		height: 300px;
+		height: 400px;
 		&__section {
 			background-color: #00b27c;
 			position: relative;
@@ -223,7 +227,7 @@ export default {
 		&__image {
 			background-color: black;
 			width: 100%;
-			height: 200px;
+			height: 300px;
 		}
 		&__title {
 			color: white;

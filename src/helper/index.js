@@ -10,7 +10,7 @@ function errorMessageHandler(code) {
 			return 'User not found.'
 			break
 		case 'auth/wrong-password':
-			return 'The password you entered is inccorect.'
+			return 'The password you entered is incorrect.'
 			break
 		case 'auth/email-already-in-use':
 			return 'The email you entered is already in use.'

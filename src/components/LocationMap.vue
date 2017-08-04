@@ -215,6 +215,7 @@ export default {
 			if (this.currentPosition) {
 				this.popUpMessageOpen = true
 				this.isLoading = true
+				this.$store.commit('closeInfoWindow')
 
 				var directionsService = new google.maps.DirectionsService
 				var directionsDisplay = new google.maps.DirectionsRenderer
@@ -250,10 +251,6 @@ export default {
 		openInfoWindow(key) {
 			this.$router.push({ query: { location: key } })
 			this.$store.commit('openInfoWindow')
-		},
-		closeInfoWindow() {
-			this.$router.push({ query: '' })
-			this.$store.commit('closeInfoWindow')
 		},
 	}
 }

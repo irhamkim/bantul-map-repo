@@ -1,12 +1,26 @@
 <template>
 	<div class="reset-password">
-		<div class="reset-password__label-wrapper">
-			<label class="reset-password__label" for="password">Password</label><span class="reset-password__error-message">{{ errorMessage }}</span>
-		</div>
-		<input class="reset-password__input" type="password" name="password" v-model.trim="passwordForm">
-		<button class="reset-password__button"
-			@click="resetPassword">Reset Password</button>
-		<router-link class="reset-password__link" to="/map">Return to app</router-link>
+			<div v-if="loading && !success" class="transition-wrapper">
+				<div class="reset-password__loading-overlay">
+					<span>Loading...</span>
+				</div>
+			</div>
+			<div v-if="success && !loading" class="transition-wrapper">
+				<div class="reset-password__message">
+					<span class="overlay-message">Your password have been reset.</span>
+				</div>
+				<router-link class="reset-password__link" to="/map">Return to app</router-link>
+			</div>
+			<div v-if="!loading && !success" class="transition-wrapper">
+				<div class="reset-password__label-wrapper">
+					<label class="reset-password__label" for="password">New password</label>
+					<span class="reset-password__error-message">{{ errorMessage }}</span>
+				</div>
+				<input class="reset-password__input" type="password" name="password" v-model.trim="passwordForm">
+				<button class="reset-password__button"
+						@click="resetPassword">Reset Password</button>
+				<router-link class="reset-password__link" to="/map">Return to app</router-link>
+			</div>
 	</div>
 </template>
 
@@ -19,26 +33,35 @@ export default {
 	props: ['code'],
 	data() {
 		return {
+			loading: false,
+			success: false,
 			errorMessage: null,
 			passwordForm: '',
 		}
 	},
 	methods: {
 		resetPassword() {
+			this.loading = true
+			/*
 			if (this.passwordForm) {
+				this.loading = true
+
 				firebase.auth().verifyPasswordResetCode(this.code).then((email) => {
-
 					firebase.auth().confirmPasswordReset(this.code, this.passwordForm).then((resp) => {
-
+						this.success = true
+						this.loading = false
 					}).catch((error) => {
 						this.errorMessage = errorMessageHandler(error.code)
+						this.loading = false
 					})
 				}).catch((error) => {
 					this.errorMessage = errorMessageHandler(error.code)
+					this.loading = false
 				})
 			} else {
 				this.errorMessage = 'Please enter a new password.'
 			}
+			*/
 		}
 	}
 }
@@ -61,10 +84,30 @@ export default {
 }
 
 /**/
+.transition-wrapper {
+	width: 100%;
+	height: 100%;
+}
+
 .reset-password {
 	@include center;
-	width: 290px;
-	height: 100px;
+	width: 300px;
+	height: 140px;
+	&__loading-overlay {
+		background-color: white;
+		@include font-default(black, 15px);
+		position: relative;
+		width: 100%;
+		height: 100%;
+		z-index: 3;
+		span {
+			@include center;
+		}
+	}
+	&__message {
+		@include font-default(black, 15px);
+		@include center;
+	}
 	&__label-wrapper {
 		display: flex;
 	}
@@ -101,7 +144,9 @@ export default {
 		box-sizing: border-box;
 		display: inline-block;
 		@include font-default(blue, 15px);
-		margin: 0 0 15px 50%;
+		position: absolute;
+		bottom: 0;
+		left: 50%;
 		transform: translate(-50%, 0);
 		padding: 0;
 		text-align: right;

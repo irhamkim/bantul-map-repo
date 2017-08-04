@@ -1,9 +1,7 @@
 <template>
 	<div class="auth">
-		<transition>
-			<reset-password v-if="mode === 'resetPassword'"
-				:code="code"></reset-password>
-		</transition>
+		<reset-password v-if="mode === 'resetPassword'"
+			:code="code"></reset-password>
 	</div>
 </template>
 
