@@ -2,11 +2,14 @@
 	<div class="auth">
 		<reset-password v-if="mode === 'resetPassword'"
 			:code="code"></reset-password>
+		<verify-email v-if="mode === 'verifyEmail'"
+			:code="code"></verify-email>
 	</div>
 </template>
 
 <script>
 import ResetPassword from './ResetPassword'
+import VerifyEmail from './VerifyEmail'
 
 export default {
 	name: 'auth',
@@ -19,7 +22,8 @@ export default {
 		}
 	},
 	components: {
-		ResetPassword: () => import('./ResetPassword')
+		ResetPassword: () => import('./ResetPassword'),
+		VerifyEmail: () => import('./VerifyEmail'),
 	}
 }
 </script>

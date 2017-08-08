@@ -1,22 +1,21 @@
 <template>
 	<div class="wrapper">
-		<div v-bar="{el1Class: 'el1', el2Class: 'info-tab'}"
-			style="width: 430px;">
+		<div v-bar="{el1Class: 'el1', el2Class: 'info-tab'}">
 			<div>
 				<div class="info-tab__head">
-					<div class="info-tab__head__section">
-						<div class="info-tab__head__title">
+					<div class="info-tab__section">
+						<div class="info-tab__title">
 							{{ locationData.name }}
 						</div>
-						<button class="info-tab__head__flat-button info-tab__head__flat-button--close"
+						<button class="info-tab__flat-button info-tab__flat-button--close"
 							@click="closeInfoWindow">
 						</button>
 					</div>
-					<div class="info-tab__head__image">
+					<div class="info-tab__image">
 						This is a placeholder image for location {{ this.$route.query.location }}
 					</div>
-					<div class="info-tab__head__section info-tab__head__section--bottom">
-						<div class="info-tab__head__title">
+					<div class="info-tab__section info-tab__section--bottom">
+						<div class="info-tab__title">
 							{{ locationData.address }}
 						</div>
 					</div>
@@ -43,6 +42,9 @@
 						<button class="info-tab__float-button info-tab__float-button--delete"
 							@click="deleteReview">Delete</button>
 					</div>
+				</div>
+				<div class="info-tab__review-item-wrapper">
+					<div class="info-tab__review-item-heading"></div>
 					<div v-for="(review, index) in orderedReviews" :key="index"
 						class="info-tab__review-item">
 						<span class="info-tab__review-item__user">{{ review.submittedBy }}</span>
@@ -69,7 +71,7 @@ Vue.use(Vuebar)
 
 export default {
 		name: 'infoWindow',
-		beforeMount() {
+		beforeCreate() {
 			if (this.$store.state.user) {
 				this.$bindAsObject('userReview', firebase.database().ref('users').child(this.$store.state.user.uid).child('reviews').child(this.$route.query.location))
 			}
@@ -86,11 +88,7 @@ export default {
 			}
 		},
 		firebase() {
-			return {				
-				locationData: {
-					source: firebase.database().ref('locations').child(this.$route.query.location),
-					asObject: true
-				},
+			return {
 				locationReviews: {
 					source: firebase.database().ref('locations').child(this.$route.query.location).child('reviews')
 				}
@@ -142,7 +140,7 @@ export default {
 				this.$firebaseRefs.locationReviews.child(this.$store.state.user.uid).remove()
 			},
 			openReviewWindow() {
-				this.$store.commit('openWindow', 'reviewWindow')
+				this.$store.commit('openWindow', 'reviewList')
 			},
 			closeInfoWindow() {
 				this.$store.commit('closeInfoWindow')
@@ -156,17 +154,14 @@ export default {
 @mixin box-shadow {
 	box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 }
-@mixin font-default($color, $size) {
+@mixin font-default($color, $size, $weight : 100) {
 	color: $color;
 	font-family: Roboto, Helvetica;
 	font-size: $size;
+	font-weight: $weight;
 }
 
 /* vuebar styles */
-@mixin gray($o) {
-	background-color: rgba(0, 178, 124, $o)
-}
-
 .wrapper {
 	position: absolute !important;
 	height: 100vh;
@@ -215,7 +210,8 @@ export default {
 		position: relative;
 		width: 100%;
 		height: 400px;
-		&__section {
+	}
+	&__section {
 			background-color: #00b27c;
 			position: relative;
 			width: 100%;
@@ -231,7 +227,7 @@ export default {
 		}
 		&__title {
 			color: white;
-			@include font-default(white, 17px);
+			@include font-default(white, 17px, 400);
 			position: absolute;
 			top: 15px;
 			left: 5px;
@@ -243,6 +239,13 @@ export default {
 			font-size: 22px;
 			&:focus {
 				outline-style: none;
+			}
+			&--bottom {
+				background-color: white;
+				display: block;
+				@include font-default(#00b27c, 15px, 400);
+				width: 100%;
+				height: 40px;
 			}
 			&--close {
 				position: absolute;
@@ -262,7 +265,6 @@ export default {
 				}
 			}
 		}
-	}
 	&__direction-button{
 		background-color: white;
 		border: none;
@@ -292,17 +294,10 @@ export default {
 		position: relative;
 		width: 100%;
 		&__section {
-			border-bottom: 3px solid #00b27c;
+			border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 			position: relative;
 			width: 100%;
-			height: 200px;
-			&::after {
-				content: 'Reviews';
-				@include font-default(#00b27c, 20px);
-				position: absolute;
-				bottom: 0px;
-				left: 10px;
-			}
+			height: 250px;
 		}
 		&__user-review {
 			@include font-default(black, 15px)
@@ -310,7 +305,7 @@ export default {
 			top: 15%;
 			left: 50%;
 			transform: translate(-50%, 0);
-			width: 350px;
+			width: 300px;
 			text-align: justify;
 			word-wrap: break-word;
 		}
@@ -354,14 +349,32 @@ export default {
 			width: 65px;
 		}
 	}
-	&__review-item {
-		border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+	&__review-item-wrapper {
+		width: 100%;
+	}
+	&__review-item-heading {
+		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+		font-weight: bold;
 		position: relative;
 		width: 100%;
-		height: 100px;
+		height: 35px;
+		&::before {
+			content: 'Reviews';
+			@include font-default(black, 20px, 400);
+			position: absolute;
+			top: 50%;
+			left: 10px;
+			transform: translateY(-50%);
+		}
+	}
+	&__review-item {
+		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+		box-sizing: border-box;
+		position: relative;
+		width: 100%;
+		height: 120px;
 		&__user {
-			@include font-default(black, 15px);
-			font-weight: 700;
+			@include font-default(black, 15px, 400);
 			position: absolute;
 			top: 5px;
 			left: 10px;
@@ -371,7 +384,7 @@ export default {
 			position: absolute;
 			top: 22px;
 			left: 10px;
-			width: 400px;
+			width: 300px;
 			word-wrap: break-word;
 		}
 		&__time {
@@ -379,19 +392,6 @@ export default {
 			position: absolute;
 			right: 10px;
 			bottom: 5px;
-		}
-	}
-	&__flat-button {
-		background-color: white;
-		border: none;
-		&:focus {
-			outline-style: none;
-		}
-		&--bottom {
-			display: block;
-			@include font-default(#00b27c, 15px);
-			width: 100%;
-			height: 40px;
 		}
 	}
 }

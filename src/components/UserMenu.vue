@@ -1,8 +1,13 @@
 <template>
 	<div class="user-menu">
-		<div class="user-menu__header">
-			<div class="user-menu__image"></div>
+		<div class="user-menu__section">
+			<div class="user-menu__header"></div>
+			<div class="user-menu__profile"></div>
 		</div>
+		<button class="user-menu__button user-menu__button--locations"
+			@click=""></button>
+		<button class="user-menu__button user-menu__button--categories"
+			@click=""></button>
 		<template v-if="!isLoggedIn">
 			<button class="user-menu__button user-menu__button--login"
 				@click="openLoginForm"></button>
@@ -13,11 +18,13 @@
 			<button class="user-menu__button user-menu__button--logout"
 				@click="logOutUser"></button>
 		</template>
+		<div class="user-menu__footer">Material Design Icons &copy; Google</div>
 	</div>
 </template>
 
 <script>
 import firebase from '../firebaseConfig'
+
 export default {
 	name: 'userMenu',
 	computed: {
@@ -51,10 +58,11 @@ export default {
 @mixin box-shadow {
 	box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 }
-@mixin font-default($color, $size) {
+@mixin font-default($color, $size, $weight : 100) {
 	color: $color;
 	font-family: Roboto, Helvetica;
 	font-size: $size;
+	font-weight: $weight;
 }
 @mixin center {
 	position: absolute;
@@ -62,11 +70,17 @@ export default {
 	left: 50%;
 	transform: translate(-50%, -50%);
 }
-@mixin button-text {
+@mixin button-icon {
 	position: absolute;
 	top: 50%;
 	left: 20px;
-	transform: translate(0, -50%);
+	transform: translateY(-50%);
+}
+@mixin button-text {
+	position: absolute;
+	top: 50%;
+	left: 70px;
+	transform: translateY(-50%);
 }
 .user-menu {
 	background-color: white;
@@ -86,36 +100,82 @@ export default {
 	&__button {
 		background-color: inherit;
 		border: none;
-		border-bottom: 1px solid rgb(10, 10, 10);
 		position: relative;
 		width: 100%;
-		height: 90px;
+		height: 50px;
 		&:focus {
 			outline-style: none;
 		}
+		&--locations {
+			&::before {
+				content: 'L';
+				@include button-icon;
+			}
+			&::after {
+				content: 'Locations';
+				@include font-default(black, 15px);
+				@include button-text;
+			}
+		}
+		&--categories {
+			&::before {
+				content: 'C';
+				@include button-icon;
+			}
+			&::after {
+				content: 'Categories';
+				@include font-default(black, 15px);
+				@include button-text;
+			}
+		}
 		&--login {
 			&::before {
+				content: 'L';
+				@include button-icon;
+			}
+			&::after {
 				content: 'Login';
-				@include font-default(black, 17px);
+				@include font-default(black, 15px);
 				@include button-text;
 			}
 		}
 		&--bookmarks {
 			&::before {
+				content: 'B';
+				@include button-icon;
+			}
+			&::after {
 				content: 'Bookmarks';
-				@include font-default(black, 17px);
+				@include font-default(black, 15px);
 				@include button-text;
 			}
 		}
 		&--logout {
 			&::before {
+				content: 'L';
+				@include button-icon;
+			}
+			&::after {
 				content: 'Log Out';
-				@include font-default(black, 17px);
+				@include font-default(black, 15px);
 				@include button-text;
 			}
 		}
 	}
-	
+	&__profile {
+		background-color: #ccc;
+		border-bottom: 1px solid #cccccc;
+		box-sizing: border-box;
+		width: 100%;
+		height: 150px;
+	}
+	&__footer {
+		box-sizing: border-box;
+		@include font-default(black, 11px);
+		padding: 20px;
+		position: absolute;
+		bottom: 0;
+	}
 	
 }
 </style>

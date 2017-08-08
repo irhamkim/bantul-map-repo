@@ -41,8 +41,6 @@ export default {
 	},
 	methods: {
 		resetPassword() {
-			this.loading = true
-			/*
 			if (this.passwordForm) {
 				this.loading = true
 
@@ -61,7 +59,6 @@ export default {
 			} else {
 				this.errorMessage = 'Please enter a new password.'
 			}
-			*/
 		}
 	}
 }
@@ -71,10 +68,11 @@ export default {
 @mixin box-shadow {
 	box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 }
-@mixin font-default($color, $size) {
+@mixin font-default($color, $size, $weight : 100) {
 	color: $color;
 	font-family: Roboto, Helvetica;
 	font-size: $size;
+	font-weight: $weight;
 }
 @mixin center {
 	position: absolute;

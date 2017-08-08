@@ -8,13 +8,15 @@
 		</div>
 		<button class="floating-menu__flat-button floating-menu__flat-button--search"
 			@click="searchLocation"></button>
-		<button v-if="windowOpen" class="floating-menu__flat-button floating-menu__flat-button--cancel"
+		<button v-if="windowOpen" class="floating-menu__flat-button
+		floating-menu__flat-button--cancel"
 			@click="closeWindow(), closeMenu()"></button>
 		<button v-if="!windowOpen && !searchKeyword" class="floating-menu__flat-button floating-menu__flat-button--menu"
 			@click="openMenu">
 		</button>
-		<button v-if="!windowOpen && searchKeyword" class="floating-menu__flat-button"
-			@click="closeSearchResult">Cancel
+		<button v-if="!windowOpen && searchKeyword" class="floating-menu__flat-button
+		floating-menu__flat-button--cancel"
+			@click="closeSearchResult">
 		</button>
 	</div>
 </template>
@@ -71,6 +73,14 @@ export default {
 </script>
 	
 <style lang="scss">
+/** Mixins **/
+@mixin font-default($color, $size, $weight : 100) {
+	color: $color;
+	font-family: Roboto, Helvetica;
+	font-size: $size;
+	font-weight: $weight;
+}
+/*****/
 .floating-menu {
 	background-color: white;
 	border-radius: 5px;
@@ -100,8 +110,7 @@ export default {
 	&__search-input {
 		border: none;
 		box-sizing: border-box;
-		font-family: Roboto, Helvetica;
-		font-size: 17px;
+		@include font-default(black, 17px);
 		width: 100%;
 		padding-left: 5px;
 		height: 30px;
@@ -118,8 +127,7 @@ export default {
 		box-sizing: border-box;
 		color: white;
 		flex: 1 1 15%;
-		font-family: Roboto, Helvetica;
-		font-size: 17px;
+		@include font-default(black, 17px);
 		height: 30px;
 		&:focus {
 			outline-style: none;
@@ -131,9 +139,9 @@ export default {
 		border: none;
 		color: rgba(0, 0, 0, 0.5);
 		flex: 1 1 15%;
-		font-family: Roboto, Helvetica;
-		font-size: 17px;
+		@include font-default(black, 17px);
 		position: relative;
+		max-width: 15%;
 		height: 30px;
 		&:focus {
 			outline-style: none;

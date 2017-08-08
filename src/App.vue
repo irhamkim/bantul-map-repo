@@ -22,7 +22,7 @@ export default {
 
   .slide-fade-horizontal-enter {
   	opacity: 0;
-    left: -50px;
+    left: -50%;
   }
 
   .slide-fade-horizontal-enter-to {
@@ -37,7 +37,7 @@ export default {
 
   .slide-fade-horizontal-leave-to {
   	opacity: 0;
-    right: -50px;
+    right: -50%;
   }
 
   .slide-fade-horizontal-enter-active {

@@ -4,7 +4,6 @@
 		</omnibox>
 		<transition name="fade">
 			<info-window v-if="infoWindowOpen"
-				@set-height="setHeight"
 				@get-direction="getDirection">
 			</info-window>
 		</transition>
@@ -16,6 +15,9 @@
 		</transition>
 		<transition name="fade">
 			<omniform v-if="openForm"></omniform>
+		</transition>
+		<transition name="fade">
+			<review-list v-if="openWindow === 'reviewList'"></review-list>
 		</transition>
 		<transition name="fade">
 			<div v-if="popUpMessageOpen" class="map__popup-message">
@@ -68,6 +70,7 @@ import Omnibox from './Omnibox'
 import Omniform from './Omniform'
 import SearchResult from './SearchResult'
 import UserMenu from './UserMenu'
+import ReviewList from './ReviewList'
 import Vue from 'vue'
 import * as VueGoogleMaps from 'vue2-google-maps'
 import firebase from '../firebaseConfig'
@@ -89,6 +92,7 @@ export default {
 						lat: position.lat,
 						lng: position.lng
 					}
+					this.$store.commit('openInfoWindow')
 				}
 			})
 		}
@@ -126,6 +130,14 @@ export default {
 			errorMessage: null,
 		}
 	},
+	components: {
+		Omnibox,
+		Omniform: () => import('./Omniform'),
+		InfoWindow: () => import('./InfoWindow'),
+		SearchResult: () => import('./SearchResult'),
+		UserMenu: () => import('./UserMenu'),
+		ReviewList: () => import('./ReviewList'),
+	},	
 	computed: {
 		infoWindowOpen() {
 			return this.$store.state.infoWindowOpen
@@ -145,21 +157,20 @@ export default {
 			locations: firebase.database().ref('locations')
 		}
 	},
-	components: {
-		Omnibox,
-		Omniform: () => import('./Omniform'),
-		InfoWindow: () => import('./InfoWindow'),
-		SearchResult: () => import('./SearchResult'),
-		UserMenu: () => import('./UserMenu'),
+	watch: {
+		'$route' (to, from) {
+			if (to.query.location) {
+				firebase.database().ref('locations').on('value', (snapshot) => {
+					if (snapshot.hasChild(this.$route.query.location)) {
+						let position = snapshot.child(this.$route.query.location).child('position').val()
+						this.panTo(position)
+						this.$store.commit('openInfoWindow')
+					}
+				})
+			}
+		}
 	},
 	methods: {
-		setHeight(h) {
-			if (h) {
-				this.styles.height = h + 'px'
-			} else {
-				this.styles.height = '100%'
-			}
-		},
 		allowGeolocation() {
 			this.errorMessage = null
 			this.isLoading = true
@@ -261,10 +272,11 @@ export default {
 @mixin box-shadow {
 	box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 }
-@mixin font-default($color, $size) {
+@mixin font-default($color, $size, $weight : 100) {
 	color: $color;
 	font-family: Roboto, Helvetica;
 	font-size: $size;
+	font-weight: $weight;
 }
 @mixin center {
 	position: absolute;

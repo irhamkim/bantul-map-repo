@@ -69,6 +69,9 @@ export default {
 	&__flat-button {
 		background-color: white;
 		border: none;
+		&:focus {
+			outline-style: none;
+		}
 		&--close {
 			position: absolute;
 			top: 15px;
@@ -86,10 +89,7 @@ export default {
 				width: 15px;
 				height: 15px;
 			}
-			}
-			&:focus {
-				outline-style: none;
-			}
 		}
+	}
 }
 </style>

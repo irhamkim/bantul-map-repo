@@ -22,7 +22,7 @@ function errorMessageHandler(code) {
 			return 'Action code is expired.'
 			break
 		case 'auth/invalid-action-code':
-			return 'Action code is expired.'
+			return 'Action code is invalid.'
 			break
 	}
 }

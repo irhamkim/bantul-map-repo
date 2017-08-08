@@ -33,9 +33,9 @@
 				</div>
 				<div class="login-form__button-group">
 					<button class="login-form__circle-button login-form__circle-button--google"
-						@click="logInUserWithProvider('google')">Google</button>
+						@click="logInUserWithProvider('google')"></button>
 					<button class="login-form__circle-button login-form__circle-button--facebook"
-						@click="logInUserWithProvider('facebook')">Facebook</button>
+						@click="logInUserWithProvider('facebook')"></button>
 				</div>
 			</div>
 		</transition>
@@ -101,10 +101,11 @@
 @mixin box-shadow {
 	box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 }
-@mixin font-default($color, $size) {
+@mixin font-default($color, $size, $weight : 100) {
 	color: $color;
 	font-family: Roboto, Helvetica;
 	font-size: $size;
+	font-weight: $weight;
 }
 @mixin center {
 	position: absolute;
@@ -195,6 +196,7 @@
 		&--register {
 			margin: 0 0 15px 50%;
 			transform: translate(-50%, 0);
+			text-align: center;
 		}
 		&--forgot {
 			flex: 1 1 auto;
@@ -222,23 +224,39 @@
 	}
 	&__button-group {
 		box-sizing: border-box;
-		margin: 15px 0;
+		display: flex;
+		justify-content: center;
+		margin-top: 10px;
 		position: absolute;
 		left: 50%;
 		transform: translate(-50%, 0);
+		width: 300px;
 	}
 	&__circle-button {
 		background-color: white;
 		border: 1px solid #00b27c;
 		border-radius: 50%;
+		flex: 0 0 70px;
 		width: 70px;
+		max-width: 70px;
 		height: 70px;
 		&:focus {
 			outline-style: none;
 		}
 		&--google {
+			&::before {
+				content: 'Google';
+				font-size: 9px;
+				text-align: center;
+			}
 		}
 		&--facebook {
+			&::before {
+				content: 'Facebook';
+				font-size: 9px;
+				text-align: center;
+				
+			}
 		}
 	}
 }
