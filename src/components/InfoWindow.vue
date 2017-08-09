@@ -19,7 +19,12 @@
 							{{ locationData.address }}
 						</div>
 					</div>
-					<button class="info-tab__direction-button"
+					<button v-if="isLoggedIn"
+						class="info-tab__fab info-tab__fab--bookmark"
+						:class="currentUserBookmarked ? 'info-tab__fab--bookmark--true' : 'info-tab__fab--bookmark--false'"
+						@click="toggleBookmark">
+					</button>
+					<button class="info-tab__fab info-tab__fab--direction"
 						@click="getDirection">
 					</button>
 				</div>
@@ -71,20 +76,34 @@ Vue.use(Vuebar)
 
 export default {
 		name: 'infoWindow',
-		beforeCreate() {
+		beforeMount() {
 			if (this.$store.state.user) {
 				this.$bindAsObject('userReview', firebase.database().ref('users').child(this.$store.state.user.uid).child('reviews').child(this.$route.query.location))
+				this.$bindAsObject('userBookmark', firebase.database().ref('users').child(this.$store.state.user.uid).child('bookmarks').child(this.$route.query.location))
+
+				/**/
 			}
 			if (this.$route.query.location) {
 				this.$bindAsObject('locationData', firebase.database().ref('locations').child(this.$route.query.location))
 			}
+				this.$firebaseRefs.userReview.once('value', (snapshot) => {
+					if (snapshot.hasChild('content')) {
+						this.currentUserReviewed = true
+					}
+				})
+				this.$firebaseRefs.userBookmark.once('value', (snapshot) => {
+					if (snapshot.hasChild('b')) {
+						this.currentUserBookmarked = true
+					}
+				})
 		},
 		data() {
 			return {
-				start: false,
-				active: false,
-				end: false,
 				locationReviews: [],
+				currentUserReviewed: false,
+				currentUserBookmarked: false,
+				userBookmark: [],
+				userReview: [],
 			}
 		},
 		firebase() {
@@ -105,11 +124,11 @@ export default {
 			isLoggedIn() {
 				return this.$store.state.user ? true : false
 			},
-			currentUserReviewed() {
+			/**currentUserReviewed() {
 				if (this.$store.state.user) {
 					let val
-					this.$firebaseRefs.locationReviews.on('value', (snapshot) => {
-						if (snapshot.hasChild(this.$store.state.user.uid)) {
+					this.$firebaseRefs.userReview.once('value', (snapshot) => {
+						if (snapshot.hasChild(this.$route.query.location)) {
 							val = true
 						} else {
 							val = false
@@ -119,12 +138,53 @@ export default {
 				} else {
 					return false
 				}
-
-			}
+			},
+			currentUserBookmarked() {
+				if (this.$store.state.user) {
+					let val
+					firebase.database().ref('users').child(this.$store.state.user.uid).child('bookmarks').once('value', (snapshot) => {
+						if (snapshot.hasChild(this.$route.query.location)) {
+							val = true
+						} else {
+							val = false
+						}
+					})
+					return val
+				} else {
+					return false
+				}
+			},**/
+		},
+		watch: {
+			userReview(n, o) {
+				if (n.content) {
+					this.currentUserReviewed = true
+				} else {
+					this.currentUserReviewed = false
+				}
+			},
+			userBookmark(n, o) {
+				if (n.b) {
+					this.currentUserBookmarked = true
+				} else {
+					this.currentUserBookmarked = false
+				}
+			},
 		},
 		methods: {
 			submitTime(time) {
 				return moment(time).calendar()
+			},
+			toggleBookmark() {
+				firebase.database().ref('users').child(this.$store.state.user.uid).child('bookmarks').once('value', (snapshot) => {
+						if (snapshot.hasChild(this.$route.query.location)) {
+							firebase.database().ref('users').child(this.$store.state.user.uid).child('bookmarks').child(this.$route.query.location).remove()
+						} else {
+							firebase.database().ref('users').child(this.$store.state.user.uid).child('bookmarks').child(this.$route.query.location).set({
+								b: true
+							})
+						}
+					})
 			},
 			getDirection() {
 				this.$emit('get-direction', this.locationData.position)
@@ -150,7 +210,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @mixin box-shadow {
 	box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 }
@@ -164,6 +224,7 @@ export default {
 /* vuebar styles */
 .wrapper {
 	position: absolute !important;
+	width: 430px;
 	height: 100vh;
 	z-index: 4;
 	@media (max-width : 429px) {
@@ -173,28 +234,13 @@ export default {
 
 .el1 {
 	position: absolute !important;
+	width: 430px;
 	height: 100vh;
 	z-index: 4;
 	@media (max-width : 429px) {
 		width: 100%;
 	}
 }
-/**/
-
-/* List Transition */
-.list-fade-enter-active, .list-fade-leave-active {
-	transition: all 0.3s;
-}
-
-.list-fade-enter, .list-fade-leave-to {
-	opacity: 0;
-	transform: translateY(50px);
-}
-
-.list-fade-enter-to, .list-fade-leave {
-	opacity: 1;
-}
-
 /**/
 
 .info-tab {
@@ -265,29 +311,64 @@ export default {
 				}
 			}
 		}
-	&__direction-button{
+	&__fab{
 		background-color: white;
 		border: none;
 		border-radius: 50%;
+		@include box-shadow;
 		position: absolute;
-		bottom: 50px;
-		right: 15px;
-		transform: translate(0, 50%);
 		width: 50px;
 		height: 50px;
 		&:focus {
 			outline-style: none;
 		}
-		&::before {
-			background: url(../assets/compass.svg);
-			background-size: 30px;
-			content: '';
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			transform: translate(-45%,-45%);
-			width: 30px;
-			height: 30px;
+		&--bookmark {
+			bottom: 50px;
+			right: 70px;
+			transform: translate(0, 50%);
+			&--false {
+				&::before {
+					background: url('../assets/bookmark-outline.svg');
+					background-size: 25px;
+					content: '';
+					position: absolute;
+					top: 50%;
+					left: 50%;
+					transform: translate(-50%,-50%);
+					width: 25px;
+					height: 25px;
+				}	
+			}
+			&--true {
+				&::before {
+					background: url('../assets/bookmark-ribbon.svg');
+					background-size: 25px;
+					content: '';
+					position: absolute;
+					top: 50%;
+					left: 50%;
+					transform: translate(-50%,-50%);
+					width: 25px;
+					height: 25px;
+				}	
+			}
+			
+		}
+		&--direction {
+			bottom: 50px;
+			right: 15px;
+			transform: translate(0, 50%);
+			&::before {
+				background: url(../assets/compass.svg);
+				background-size: 30px;
+				content: '';
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-45%,-45%);
+				width: 30px;
+				height: 30px;
+			}
 		}
 	}
 	&__reviews {

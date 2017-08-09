@@ -59,7 +59,7 @@ export default {
 	
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 /*** Mixins ***/
 @mixin box-shadow {
 	box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
@@ -81,6 +81,8 @@ export default {
 /* vuebar styles */
 .wrapper {
 	position: absolute !important;
+	width: 430px;
+	height: 100vh;
 	z-index: 5;
 	@media (max-width : 429px) {
 		width: 100%;
@@ -89,6 +91,8 @@ export default {
 
 .el1 {
 	position: absolute !important;
+	width: 100%;
+	height: 100vh;
 	z-index: 5;
 	@media (max-width : 429px) {
 		width: 100%;
@@ -104,7 +108,7 @@ export default {
 	@include font-default(black, 17px, 400);
 	position: absolute;
 	@include center;
-	width: 400px;
+	width: 430px;
 	height: 700px;
 	@media (max-width: 429px) {
 		border-radius: 0;
@@ -119,10 +123,9 @@ export default {
 		background-color: white;
 		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 		box-sizing: border-box;
-		width: 100%;
+		width: 430px;
 		height: 50px;
-		padding: 15px;
-		position: fixed;
+		position: relative;
 		top: 0;
 		z-index: 1;
 	}
@@ -133,9 +136,9 @@ export default {
 			outline-style: none;
 		}
 		&--close {
-			position: absolute;
-			top: 15px;
-			right: 15px;
+			pposition: absolute;
+			top: 50%;
+			right: 20px;
 			width: 15px;
 			height: 15px;
 			&::before {
