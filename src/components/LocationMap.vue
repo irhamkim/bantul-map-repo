@@ -2,24 +2,21 @@
 	<div class="map">
 		<omnibox>
 		</omnibox>
-		<transition name="fade">
-			<info-window v-if="infoWindowOpen"
-				@get-direction="getDirection">
-			</info-window>
-		</transition>
-		<transition name="fade">
-			<search-result v-if="openWindow === 'searchResult'"></search-result>
-		</transition>
-		<transition name="fade">
-			<user-menu v-if="userMenuOpen"></user-menu>
-		</transition>
-		<transition name="fade">
-			<omniform v-if="openForm"></omniform>
-		</transition>
-		<transition name="fade">
-			<review-list v-if="openWindow === 'reviewList'"></review-list>
-		</transition>
-		<transition name="fade">
+		<info-window v-if="currentActiveWindow === 'infoWindow'"
+			@get-direction="getDirection">
+		</info-window>
+		<search-result v-if="currentActiveWindow === 'searchResult'">
+		</search-result>
+		<user-menu v-if="currentActiveWindow === 'userMenu'">
+		</user-menu>
+		<omniform v-if="currentActiveForm"></omniform>
+		<category-list v-if="currentActiveWindow === 'categoryList'"></category-list>
+		<location-list v-if="currentActiveWindow === 'locationList'">
+		</location-list>
+		<location-by-category v-if="currentActiveWindow === 'locationbc'"></location-by-category>
+		<review-list v-if="currentActiveWindow === 'reviewList'">
+		</review-list>
+		<transition name="fade" mode="out-in">
 			<div v-if="popUpMessageOpen" class="map__popup-message">
 				<transition name="fade">
 					<div v-if="!errorMessage && !isLoading">
@@ -70,7 +67,11 @@ import Omnibox from './Omnibox'
 import Omniform from './Omniform'
 import SearchResult from './SearchResult'
 import UserMenu from './UserMenu'
+import CategoryList from './CategoryList'
+import LocationList from './LocationList'
+import LocationByCategory from './LocationByCategory'
 import ReviewList from './ReviewList'
+import InfoWindow from './InfoWindow'
 import Vue from 'vue'
 import * as VueGoogleMaps from 'vue2-google-maps'
 import firebase from '../firebaseConfig'
@@ -92,7 +93,6 @@ export default {
 						lat: position.lat,
 						lng: position.lng
 					}
-					this.$store.commit('openInfoWindow')
 				}
 			})
 		}
@@ -108,6 +108,7 @@ export default {
 				})
 			}
 		})
+		this.handleRoute(this.$route.query);
 	},
 	data() {
 		return {
@@ -128,6 +129,8 @@ export default {
 			currentPosition: null,
 			isLoading: false,
 			errorMessage: null,
+			currentActiveWindow: null,
+			currentActiveForm: null,
 		}
 	},
 	components: {
@@ -136,21 +139,10 @@ export default {
 		InfoWindow: () => import('./InfoWindow'),
 		SearchResult: () => import('./SearchResult'),
 		UserMenu: () => import('./UserMenu'),
+		CategoryList: () => import('./CategoryList'),
+		LocationList: () => import('./LocationList'),
+		LocationByCategory: () => import('./LocationByCategory'),
 		ReviewList: () => import('./ReviewList'),
-	},	
-	computed: {
-		infoWindowOpen() {
-			return this.$store.state.infoWindowOpen
-		},
-		userMenuOpen() {
-			return this.$store.state.userMenuOpen
-		},
-		openWindow() {
-			return this.$store.state.openWindow
-		},
-		openForm() {
-			return this.$store.state.openForm
-		}
 	},
 	firebase() {
 		return {
@@ -159,18 +151,22 @@ export default {
 	},
 	watch: {
 		'$route' (to, from) {
-			if (to.query.location) {
-				firebase.database().ref('locations').on('value', (snapshot) => {
-					if (snapshot.hasChild(this.$route.query.location)) {
-						let position = snapshot.child(this.$route.query.location).child('position').val()
-						this.panTo(position)
-						this.$store.commit('openInfoWindow')
-					}
-				})
-			}
+			this.handleRoute(to.query)
 		}
 	},
 	methods: {
+		handleRoute(q) {
+			if (q.window) {
+				this.currentActiveWindow = q.window
+			} else {
+				this.currentActiveWindow = null
+			}
+			if (q.form) {
+				this.currentActiveForm = q.form
+			} else {
+				this.currentActiveForm = null
+			}
+		},
 		allowGeolocation() {
 			this.errorMessage = null
 			this.isLoading = true
@@ -260,8 +256,7 @@ export default {
 			}
 		},
 		openInfoWindow(key) {
-			this.$router.push({ query: { location: key } })
-			this.$store.commit('openInfoWindow')
+			this.$router.push({ query: { window: 'infoWindow', key: key } })
 		},
 	}
 }

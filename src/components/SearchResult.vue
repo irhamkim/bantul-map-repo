@@ -24,7 +24,7 @@ import firebase from '../firebaseConfig'
 		name: 'SearchResult',
 		data() {
 			return {
-				locations: []
+				locations: [],
 			}
 		},
 		firebase() {
@@ -37,19 +37,19 @@ import firebase from '../firebaseConfig'
 		computed: {
 			resultByName() {
 				return this.locations.filter((res) => {
-					let keyword = this.$store.state.keyword.toLowerCase()
+					let keyword = this.$route.query.q.toLowerCase()
 					return res.name.toLowerCase().includes(keyword)
 				})
 			},
 			resultByAddress() {
 				return this.locations.filter((res) => {
-					let keyword = this.$store.state.keyword.toLowerCase()
+					let keyword = this.$route.query.q.toLowerCase()
 					return res.address.toLowerCase().includes(keyword)
 				})
 			},
 			resultByCategory() {
 				return this.locations.filter((res) => {
-					let keyword = this.$store.state.keyword.toLowerCase()
+					let keyword = this.$route.query.q.toLowerCase()
 					return res.category.toLowerCase().includes(keyword)
 				})
 			}

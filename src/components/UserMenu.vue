@@ -5,16 +5,16 @@
 			<div class="user-menu__profile"></div>
 		</div>
 		<button class="user-menu__button user-menu__button--locations"
-			@click=""></button>
+			@click="openWindow('locationList')"></button>
 		<button class="user-menu__button user-menu__button--categories"
-			@click=""></button>
+			@click="openWindow('categoryList')"></button>
 		<template v-if="!isLoggedIn">
 			<button class="user-menu__button user-menu__button--login"
 				@click="openLoginForm"></button>
 		</template>
 		<template v-else>
 			<button class="user-menu__button user-menu__button--bookmarks"
-				@click="openBookmarkWindow"></button>
+				@click="openWindow('bookmarks')"></button>
 			<button class="user-menu__button user-menu__button--logout"
 				@click="logOutUser"></button>
 		</template>
@@ -37,10 +37,10 @@ export default {
 			this.$store.commit('closeWindow')
 		},
 		openLoginForm() {
-			this.$store.commit('openForm', 'loginForm')
+			this.$router.push({ query: { form: 'loginForm' } })
 		},
-		openBookmarkWindow() {
-			this.$store.commit('openWindow', 'bookmarks')
+		openWindow(n) {
+			this.$router.push({ query: { window: n } })
 		},
 		logOutUser() {
 			firebase.auth().signOut().then(() => {

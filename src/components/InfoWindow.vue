@@ -12,7 +12,7 @@
 						</button>
 					</div>
 					<div class="info-tab__image">
-						This is a placeholder image for location {{ this.$route.query.location }}
+						This is a placeholder image for location {{ this.$route.query.key }}
 					</div>
 					<div class="info-tab__section info-tab__section--bottom">
 						<div class="info-tab__title">
@@ -78,14 +78,10 @@ export default {
 		name: 'infoWindow',
 		beforeMount() {
 			if (this.$store.state.user) {
-				this.$bindAsObject('userReview', firebase.database().ref('users').child(this.$store.state.user.uid).child('reviews').child(this.$route.query.location))
-				this.$bindAsObject('userBookmark', firebase.database().ref('users').child(this.$store.state.user.uid).child('bookmarks').child(this.$route.query.location))
+				this.$bindAsObject('userReview', firebase.database().ref('users').child(this.$store.state.user.uid).child('reviews').child(this.$route.query.key))
+				this.$bindAsObject('userBookmark', firebase.database().ref('users').child(this.$store.state.user.uid).child('bookmarks').child(this.$route.query.key))
 
 				/**/
-			}
-			if (this.$route.query.location) {
-				this.$bindAsObject('locationData', firebase.database().ref('locations').child(this.$route.query.location))
-			}
 				this.$firebaseRefs.userReview.once('value', (snapshot) => {
 					if (snapshot.hasChild('content')) {
 						this.currentUserReviewed = true
@@ -96,6 +92,11 @@ export default {
 						this.currentUserBookmarked = true
 					}
 				})
+			}
+			if (this.$route.query.key) {
+				this.$bindAsObject('locationData', firebase.database().ref('locations').child(this.$route.query.key))
+			}
+				
 		},
 		data() {
 			return {
@@ -109,7 +110,7 @@ export default {
 		firebase() {
 			return {
 				locationReviews: {
-					source: firebase.database().ref('locations').child(this.$route.query.location).child('reviews')
+					source: firebase.database().ref('locations').child(this.$route.query.key).child('reviews')
 				}
 			}
 		},
@@ -128,7 +129,7 @@ export default {
 				if (this.$store.state.user) {
 					let val
 					this.$firebaseRefs.userReview.once('value', (snapshot) => {
-						if (snapshot.hasChild(this.$route.query.location)) {
+						if (snapshot.hasChild(this.$route.query.key)) {
 							val = true
 						} else {
 							val = false
@@ -143,7 +144,7 @@ export default {
 				if (this.$store.state.user) {
 					let val
 					firebase.database().ref('users').child(this.$store.state.user.uid).child('bookmarks').once('value', (snapshot) => {
-						if (snapshot.hasChild(this.$route.query.location)) {
+						if (snapshot.hasChild(this.$route.query.key)) {
 							val = true
 						} else {
 							val = false
@@ -177,10 +178,10 @@ export default {
 			},
 			toggleBookmark() {
 				firebase.database().ref('users').child(this.$store.state.user.uid).child('bookmarks').once('value', (snapshot) => {
-						if (snapshot.hasChild(this.$route.query.location)) {
-							firebase.database().ref('users').child(this.$store.state.user.uid).child('bookmarks').child(this.$route.query.location).remove()
+						if (snapshot.hasChild(this.$route.query.key)) {
+							firebase.database().ref('users').child(this.$store.state.user.uid).child('bookmarks').child(this.$route.query.key).remove()
 						} else {
-							firebase.database().ref('users').child(this.$store.state.user.uid).child('bookmarks').child(this.$route.query.location).set({
+							firebase.database().ref('users').child(this.$store.state.user.uid).child('bookmarks').child(this.$route.query.key).set({
 								b: true
 							})
 						}
@@ -190,21 +191,20 @@ export default {
 				this.$emit('get-direction', this.locationData.position)
 			},
 			openReviewForm() {
-				this.$store.commit('openForm', 'reviewForm')
+				this.$router.push({ query: { form: 'reviewForm', key: this.$route.query.key } })
 			},
 			openLoginForm() {
-				this.$store.commit('openForm', 'loginForm')
+				this.$router.push({ query: { form: 'loginForm' } })
 			},
 			deleteReview() {
 				this.$firebaseRefs.userReview.remove()
 				this.$firebaseRefs.locationReviews.child(this.$store.state.user.uid).remove()
 			},
 			openReviewWindow() {
-				this.$store.commit('openWindow', 'reviewList')
+				this.$router.push({ query: { window: 'reviewList', key: this.$route.query.key } })
 			},
 			closeInfoWindow() {
-				this.$store.commit('closeInfoWindow')
-				this.$router.push({ query: '' })
+				this.$router.go(-1)
 			}
 		}
 }

@@ -35,36 +35,29 @@ export default {
 			return this.$store.state.user ? true : false
 		},
 		windowOpen() {
-			return this.$store.state.openWindow || this.$store.state.userMenuOpen ? true : false
+			return this.$route.query.window === 'userMenu' ? true : false
 		},
-		infoWindowOpen() {
-			return this.$store.state.infoWindowOpen ? true : false
-		}
 	},
 	methods: {
 		searchLocation() {
 			if (this.searchKeyword) {
-				this.$store.commit('searchLocation', this.searchKeyword)
-				this.$store.commit('openWindow', 'searchResult')
+				this.$router.push({ query: { window: 'searchResult', q: this.searchKeyword } })
 			} else {
-				this.$store.state.openWindow === 'infoWindow' ? '' : this.$store.commit('closeWindow')
+				this.$router.go(-1)
 			}
 		},
-		openLoginForm() {
-			this.$store.commit('openForm', 'loginForm')
-		},
 		openMenu() {
-			this.$store.commit('openUserMenu')
+			this.$router.push({ query: { window: 'userMenu' } })
 		},
 		closeMenu() {
-			this.$store.commit('closeUserMenu')
+			this.$router.go(-1)
 		},
 		closeSearchResult() {
 			this.searchKeyword = null
-			this.$store.commit('closeWindow')
+			this.$router.go(-1)
 		},
 		closeWindow() {
-			this.$store.commit('closeWindow')
+			this.$router.go(-1)
 		},
 	}
 

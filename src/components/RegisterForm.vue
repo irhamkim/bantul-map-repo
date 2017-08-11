@@ -43,7 +43,7 @@
 
 <script>
 import firebase from '../firebaseConfig'
-import errorMessageHandler from '../helper'
+import { errorMessageHandler } from '../helper'
 
 export default {
 	name: 'registerForm',

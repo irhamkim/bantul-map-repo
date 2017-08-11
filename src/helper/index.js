@@ -27,4 +27,4 @@ function errorMessageHandler(code) {
 	}
 }
 
-export default errorMessageHandler
+export { errorMessageHandler }

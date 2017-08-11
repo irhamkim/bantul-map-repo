@@ -34,10 +34,10 @@ export default {
 	firebase() {
 		return {
 			locationReviews: {
-				source: firebase.database().ref('locations').child(this.$route.query.location).child('reviews')
+				source: firebase.database().ref('locations').child(this.$route.query.key).child('reviews')
 			},
 			contentEdit: {
-				source: firebase.database().ref('users').child(this.$store.state.user.uid).child('reviews').child(this.$route.query.location),
+				source: firebase.database().ref('users').child(this.$store.state.user.uid).child('reviews').child(this.$route.query.key),
 				asObject: true
 			}
 		}
@@ -57,7 +57,7 @@ export default {
 	},
 	methods: {
 		closeReviewForm() {
-			this.$store.commit('closeForm')
+			this.$router.go(-1)
 		},
 		submitReview() {
 			if (this.content && (this.content.length <= 160)) {
@@ -66,7 +66,7 @@ export default {
 					submitTime: firebase.database.ServerValue.TIMESTAMP,
 					submittedBy: this.$store.state.user.providerData[0].displayName
 				})
-				firebase.database().ref('users').child(this.$store.state.user.uid).child('reviews').child(this.$route.query.location).set({
+				firebase.database().ref('users').child(this.$store.state.user.uid).child('reviews').child(this.$route.query.key).set({
 					content: this.content,
 					submitTime: firebase.database.ServerValue.TIMESTAMP
 				})
@@ -82,7 +82,7 @@ export default {
 					submitTime: firebase.database.ServerValue.TIMESTAMP,
 					submittedBy: this.$store.state.user.providerData[0].displayName
 				})
-				firebase.database().ref('users').child(this.$store.state.user.uid).child('reviews').child(this.$route.query.location).set({
+				firebase.database().ref('users').child(this.$store.state.user.uid).child('reviews').child(this.$route.query.key).set({
 					content: this.contentEdit.content,
 					submitTime: firebase.database.ServerValue.TIMESTAMP
 				})

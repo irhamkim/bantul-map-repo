@@ -8,13 +8,12 @@
 </template>
 
 <script>
+import firebase from '../firebaseConfig'
 import ResetPassword from './ResetPassword'
 import VerifyEmail from './VerifyEmail'
 
 export default {
 	name: 'auth',
-	beforeMount() {
-	},
 	data() {
 		return {
 			mode: this.$route.query.mode,

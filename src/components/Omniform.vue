@@ -1,5 +1,6 @@
-<template>
+.<template>
 	<div class="omniform">
+		<div v-if="loading" class="auth__loader"></div>
 		<button class="omniform__flat-button omniform__flat-button--close"
 			@click="closeForm"></button>
 		<transition name="fade">
@@ -22,12 +23,25 @@ import LoginForm from './LoginForm'
 import ForgotPasswordForm from './ForgotPassword'
 import RegisterForm from './RegisterForm'
 import ReviewForm from './ReviewForm'
+import firebase from '../firebaseConfig'
 
 export default {
 	name: 'omniform',
+	data() {
+		return {
+			loading: false,
+		}
+	},
+	beforeMount() {
+		firebase.auth().onAuthStateChanged((user) => {
+			if (user) {
+				this.loading = true
+			}
+		})
+	},
 	computed: {
 		openForm() {
-			return this.$store.state.openForm
+			return this.$route.query.form
 		},
 	},
 	components: {
@@ -38,13 +52,28 @@ export default {
 	},
 	methods: {
 		closeForm() {
-			this.$store.commit('closeForm')
+			this.$router.go(-1)
 		}
 	}
 }
 </script>
 
 <style lang="scss">
+/*** Mixins ***/
+@mixin font-default($color, $size, $weight : 100) {
+	color: $color;
+	font-family: Roboto, Helvetica;
+	font-size: $size;
+	font-weight: $weight;
+}
+@mixin center {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+/****/
+
 .omniform {
 	background-color: white;
 	border-radius: 5px;
@@ -65,6 +94,18 @@ export default {
 		top: 0;
 		left: 0;
 		transform: none;
+	}
+	&__loader {
+		background-color: white;
+		@include font-default(black, 18px);
+		position: relative;
+		width: 100%;
+		height: 100%;
+		z-index: 3;
+		&::before {
+			content: 'Redirecting...';
+			@include center;
+		}
 	}
 	&__flat-button {
 		background-color: white;

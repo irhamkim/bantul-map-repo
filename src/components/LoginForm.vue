@@ -44,7 +44,7 @@
 
 <script>
   import firebase from '../firebaseConfig'
-  import errorMessageHandler from '../helper'
+  import { errorMessageHandler } from '../helper'
 
   export default {
 	name: 'loginForm',
@@ -125,10 +125,7 @@
 		height: 100%;
 		z-index: 3;
 		span {
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
+			@include center;
 		}
 	}
 	&__title {
