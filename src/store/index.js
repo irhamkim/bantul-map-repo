@@ -7,49 +7,52 @@ let store = new Vuex.Store({
 	state: {
 		user: null,
 		keyword: null,
-		infoWindowOpen: false,
-		userMenuOpen: false,
-		openWindow: null,
-		openForm: null,
-		height: null,
+		activeWindow: null,
+		activeForm: null,
+		locationDetailIsActive: false,
+		searchResultIsActive: false,
+		reviewListIsActive: false,
 	},
 	mutations: {
-		setUserState: function(state, user) {
+		setUserState(state, user) {
 			state.user = user;
 		},
-		removeUserState: function(state) {
+		removeUserState(state) {
 			state.user = null;
 		},
 		searchLocation(state, keyword) {
 			state.keyword = keyword
 		},
-		openInfoWindow(state) {
-			state.infoWindowOpen = true
+		openSearchResult(state) {
+			state.searchResultIsActive = true
 		},
-		closeInfoWindow(state) {
-			state.infoWindowOpen = false
+		closeSearchResult(state) {
+			state.searchResultIsActive = false
 		},
-		openUserMenu(state) {
-			state.userMenuOpen = true
+		openLocationDetail(state) {
+			state.locationDetailIsActive = true
 		},
-		closeUserMenu(state) {
-			state.userMenuOpen = false
+		closeLocationDetail(state) {
+			state.locationDetailIsActive = false
 		},
 		openWindow(state, payload) {
-			state.openWindow = payload
+			state.activeWindow = payload
 		},
 		closeWindow(state) {
-			state.openWindow = null
+			state.activeWindow = null
 		},
 		openForm(state, payload) {
-			state.openForm = payload
+			state.activeForm = payload
 		},
 		closeForm(state) {
-			state.openForm = null
+			state.activeForm = null
 		},
-		setHeight(state, payload) {
-			state.height = payload
+		openReviewList(state) {
+			state.reviewListIsActive = true
 		},
+		closeReviewList(state) {
+			state.reviewListIsActive = false
+		}
 	},
 	actions: {
 		

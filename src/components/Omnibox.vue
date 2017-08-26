@@ -1,21 +1,24 @@
 <template>
-	<div class="floating-menu">
-		<div class="floating-menu__search-input-wrapper">
-			<input class="floating-menu__search-input" type="text" placeholder="Search location"
+	<div class="omnibox">
+		<div class="omnibox__search-input-wrapper">
+			<input class="omnibox__search-input" type="text" placeholder="Search location"
 				v-model="searchKeyword"
 				@keyup.enter="searchLocation"
 				@keyup.esc="closeSearchResult">
 		</div>
-		<button class="floating-menu__flat-button floating-menu__flat-button--search"
-			@click="searchLocation"></button>
-		<button v-if="windowOpen" class="floating-menu__flat-button
-		floating-menu__flat-button--cancel"
-			@click="closeWindow(), closeMenu()"></button>
-		<button v-if="!windowOpen && !searchKeyword" class="floating-menu__flat-button floating-menu__flat-button--menu"
-			@click="openMenu">
+		<button class="omnibox__flat-button omnibox__flat-button--search"
+			@click="searchLocation">
 		</button>
-		<button v-if="!windowOpen && searchKeyword" class="floating-menu__flat-button
-		floating-menu__flat-button--cancel"
+		<button v-if="!searchKeyword && !windowIsActive"
+			class="omnibox__flat-button omnibox__flat-button--menu"
+			@click="openUserMenu">
+		</button>
+		<button v-if="!searchKeyword && windowIsActive"
+			class="omnibox__flat-button omnibox__flat-button--cancel"
+			@click="closeWindow">
+		</button>
+		<button v-if="searchKeyword"
+			class="omnibox__flat-button omnibox__flat-button--cancel"
 			@click="closeSearchResult">
 		</button>
 	</div>
@@ -24,40 +27,40 @@
 <script>
 
 export default {
-	name: 'floatingMenu',
+	name: 'omnibox',
 	data() {
 		return {
 			searchKeyword: null,
 		}
 	},
 	computed: {
+		windowIsActive() {
+			return this.$store.state.searchResultIsActive || this.$store.state.activeWindow ? true : false 
+		},
 		isLoggedIn() {
 			return this.$store.state.user ? true : false
-		},
-		windowOpen() {
-			return this.$route.query.window === 'userMenu' ? true : false
 		},
 	},
 	methods: {
 		searchLocation() {
 			if (this.searchKeyword) {
-				this.$router.push({ query: { window: 'searchResult', q: this.searchKeyword } })
+				this.$store.commit('searchLocation', this.searchKeyword)
+				this.$store.commit('openSearchResult')
+			} else if (!this.searchKeyword && this.$store.state.activeWindow) {	
+
 			} else {
-				this.$router.go(-1)
+				this.$store.commit('closeSearchResult')
 			}
 		},
-		openMenu() {
-			this.$router.push({ query: { window: 'userMenu' } })
-		},
-		closeMenu() {
-			this.$router.go(-1)
+		openUserMenu() {
+			this.$store.commit('openWindow', 'userMenu')
 		},
 		closeSearchResult() {
 			this.searchKeyword = null
-			this.$router.go(-1)
+			this.$store.commit('closeSearchResult')
 		},
 		closeWindow() {
-			this.$router.go(-1)
+			this.$store.commit('closeWindow')
 		},
 	}
 
@@ -74,7 +77,7 @@ export default {
 	font-weight: $weight;
 }
 /*****/
-.floating-menu {
+.omnibox {
 	background-color: white;
 	border-radius: 5px;
 	box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
@@ -86,7 +89,7 @@ export default {
 	left: 5px;
 	width: 420px;
 	height: 40px;
-	z-index: 4;
+	z-index: 3;
 	@media (max-width : 429px) {
 		width: calc(100% - 10px);
 	}
@@ -103,7 +106,7 @@ export default {
 	&__search-input {
 		border: none;
 		box-sizing: border-box;
-		@include font-default(black, 17px);
+		@include font-default(#727272, 17px);
 		width: 100%;
 		padding-left: 5px;
 		height: 30px;
@@ -120,7 +123,6 @@ export default {
 		box-sizing: border-box;
 		color: white;
 		flex: 1 1 15%;
-		@include font-default(black, 17px);
 		height: 30px;
 		&:focus {
 			outline-style: none;
@@ -132,7 +134,6 @@ export default {
 		border: none;
 		color: rgba(0, 0, 0, 0.5);
 		flex: 1 1 15%;
-		@include font-default(black, 17px);
 		position: relative;
 		max-width: 15%;
 		height: 30px;
@@ -175,7 +176,7 @@ export default {
 		}
 		&--cancel {
 			&::before {
-				background: url(../assets/cancel.svg);
+				background: url(../assets/close-button.svg);
 				background-size: 20px 20px;
 				content: '';
 				position: absolute;

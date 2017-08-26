@@ -15,7 +15,7 @@
 							</div>
 							<div class="locationbc-list__details">
 								<div class="locationbc-list__name"
-									@click="openInfoWindow(location['.key'])">
+									@click="openLocationDetail(location['.key'])">
 									{{ location.name }}
 								</div>
 								<div class="locationbc-list__address">{{ location.address }}</div>
@@ -40,16 +40,16 @@ export default {
 	firebase() {
 		return {
 			locations: {
-				source: firebase.database().ref('categories').child(this.$route.query.key).child('locations')
+				source: firebase.database().ref('categories').child(this.$route.query.category).child('locations')
 			}
 		}
 	},
 	methods: {
 		closeWindow() {
-			this.$router.go(-1)
+			this.$router.push('')
 		},
-		openInfoWindow(k) {
-			this.$router.push({ query: { window: 'infoWindow', key: k } })
+		openLocationDetail(k) {
+			this.$router.push({ query: { category: this.$route.query.category, location: k } })
 		},
 	}
 }
@@ -76,7 +76,7 @@ export default {
 	position: absolute !important;
 	width: 430px;
 	height: 100vh;
-	z-index: 5;
+	z-index: 4;
 	@media (max-width : 429px) {
 		width: 100%;
 	}
@@ -98,6 +98,7 @@ export default {
 	background-color: white;
 	position: relative;
 	width: 430px;
+	z-index: 4;
 	@media (max-width: 429px) {
 		border-radius: 0;
 		box-shadow: none;
@@ -139,7 +140,7 @@ export default {
 			width: 15px;
 			height: 15px;
 			&::before {
-				background: url(../assets/cancel-black.svg);
+				background: url(../assets/close-button.svg);
 				background-size: 15px;
 				content: '';
 				position: absolute;

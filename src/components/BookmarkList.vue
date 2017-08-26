@@ -1,23 +1,26 @@
 <template>
 	<div class="wrapper">
-		<div clas="category-list">
-			<div class="category-list__header">
-				<button class="category-list__flat-button category-list__flat-button--close"
+		<div clas="bookmark-list">
+			<div class="bookmark-list__header">
+				<button class="bookmark-list__flat-button bookmark-list__flat-button--close"
 				@click="closeWindow"></button>
 			</div>
-			<div v-bar="{ el1Class: 'el1', el2Class: 'category-list__item-wrapper' }">
+			<div v-bar="{ el1Class: 'el1', el2Class: 'bookmark-list__item-wrapper' }">
 				<div>
 					<div>
-						<div v-for="(category, index) in categories" :key="index"
-							class="category-list__item">
-							<div class="category-list__img-container">
-								<img src="" :alt="category['.key']">
+						<div v-for="(location, index) in locations" :key="index"
+							class="bookmark-list__item">
+							<div class="bookmark-list__img-container">
+								<img src="" :alt="location['.key']">
 							</div>
-							<div class="category-list__details">
-								<div class="category-list__name"
-									@click="openLocationByCategory(category['.key'])">
-									{{ category.name }}
+							<div class="bookmark-list__details">
+								<div class="bookmark-list__name"
+									@click="openLocationDetail(location['.key'])">
+									{{ location.name }}
 								</div>
+								<div class="bookmark-list__category"
+									@click="openLocationByCategory(location.category.key)">{{ location.category.name }}</div>
+								<div class="bookmark-list__address">{{ location.address }}</div>
 							</div>
 						</div>
 					</div>
@@ -28,31 +31,31 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import firebase from '../firebaseConfig'
+import Vue from 'vue'
 import Vuebar from 'vuebar'
 
 Vue.use(Vuebar)
 
 export default {
-	name: 'categoryList',
+	name: 'bookmarkList',
 	firebase() {
 		return {
-			categories: {
-				source: firebase.database().ref('categories')
-			}
+			locations: firebase.database().ref('users').child(this.$store.state.user.uid).child('bookmarks')
 		}
 	},
 	methods: {
 		closeWindow() {
 			this.$store.commit('closeWindow')
 		},
+		openLocationDetail(k) {
+			this.$router.push({ query: { location: k } })
+		},
 		openLocationByCategory(k) {
 			this.$router.push({ query: { category: k } })
 		},
 	}
 }
-
 </script>
 
 <style lang="scss" scoped>
@@ -94,7 +97,7 @@ export default {
 }
 /****/
 
-.category-list {
+.bookmark-list {
 	background-color: white;
 	position: relative;
 	width: 430px;
@@ -173,6 +176,13 @@ export default {
 		cursor: pointer;
 		@include font-default(#00b27c, 17px, 400);
 	}
+	&__category {
+		cursor: pointer;
+		@include font-default(#00b27c, 15px 100);
+	}
+	&__address {
+		@include font-default(black, 15px, 100);
+	}
 
-}		
+}			
 </style>

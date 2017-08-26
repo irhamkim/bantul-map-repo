@@ -2,7 +2,6 @@
 	<div class="user-menu">
 		<div class="user-menu__section">
 			<div class="user-menu__header"></div>
-			<div class="user-menu__profile"></div>
 		</div>
 		<button class="user-menu__button user-menu__button--locations"
 			@click="openWindow('locationList')"></button>
@@ -14,7 +13,7 @@
 		</template>
 		<template v-else>
 			<button class="user-menu__button user-menu__button--bookmarks"
-				@click="openWindow('bookmarks')"></button>
+				@click="openWindow('bookmarkList')"></button>
 			<button class="user-menu__button user-menu__button--logout"
 				@click="logOutUser"></button>
 		</template>
@@ -37,10 +36,10 @@ export default {
 			this.$store.commit('closeWindow')
 		},
 		openLoginForm() {
-			this.$router.push({ query: { form: 'loginForm' } })
+			this.$store.commit('openForm', 'loginForm')
 		},
 		openWindow(n) {
-			this.$router.push({ query: { window: n } })
+			this.$store.commit('openWindow', n)
 		},
 		logOutUser() {
 			firebase.auth().signOut().then(() => {
@@ -71,10 +70,13 @@ export default {
 	transform: translate(-50%, -50%);
 }
 @mixin button-icon {
+	background-size: 20px;
 	position: absolute;
 	top: 50%;
 	left: 20px;
 	transform: translateY(-50%);
+	width: 20px;
+	height: 20px;
 }
 @mixin button-text {
 	position: absolute;
@@ -82,6 +84,7 @@ export default {
 	left: 70px;
 	transform: translateY(-50%);
 }
+/****/
 .user-menu {
 	background-color: white;
 	position: absolute;
@@ -90,12 +93,6 @@ export default {
 	z-index: 2;
 	@media (max-width : 429px) {
 		width: 100%;
-	}
-	&__header {
-		background-color: #00b27c;
-		position: relative;
-		width: 100%;
-		height: 50px;
 	}
 	&__button {
 		background-color: inherit;
@@ -108,7 +105,8 @@ export default {
 		}
 		&--locations {
 			&::before {
-				content: 'L';
+				background-image: url('../assets/location-button.svg');
+				content: '';
 				@include button-icon;
 			}
 			&::after {
@@ -119,7 +117,8 @@ export default {
 		}
 		&--categories {
 			&::before {
-				content: 'C';
+				background-image: url('../assets/list-button.svg');
+				content: '';
 				@include button-icon;
 			}
 			&::after {
@@ -130,7 +129,8 @@ export default {
 		}
 		&--login {
 			&::before {
-				content: 'L';
+				background-image: url('../assets/login-button.svg');
+				content: '';
 				@include button-icon;
 			}
 			&::after {
@@ -141,7 +141,8 @@ export default {
 		}
 		&--bookmarks {
 			&::before {
-				content: 'B';
+				background-image: url('../assets/bookmark-button.svg');
+				content: '';
 				@include button-icon;
 			}
 			&::after {
@@ -152,7 +153,8 @@ export default {
 		}
 		&--logout {
 			&::before {
-				content: 'L';
+				background-image: url('../assets/logout-button.svg');
+				content: '';
 				@include button-icon;
 			}
 			&::after {
@@ -162,17 +164,17 @@ export default {
 			}
 		}
 	}
-	&__profile {
+	&__header {
 		background-color: #ccc;
 		border-bottom: 1px solid #cccccc;
 		box-sizing: border-box;
 		width: 100%;
-		height: 150px;
+		height: 250px;
 	}
 	&__footer {
 		box-sizing: border-box;
 		@include font-default(black, 11px);
-		padding: 20px;
+		padding: 10px;
 		position: absolute;
 		bottom: 0;
 	}

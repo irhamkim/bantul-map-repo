@@ -34,13 +34,13 @@ export default {
 	firebase() {
 		return {
 			reviews: {
-				source: firebase.database().ref('locations').child(this.$route.query.key).child('reviews')
+				source: firebase.database().ref('locations').child(this.$route.query.location).child('reviews')
 			}
 		}
 	},
 	computed: {
 		orderedReviews() {
-			return this.reviews.sort((a, b) => {
+			let r = this.reviews.sort((a, b) => {
 				return b.submitTime - a.submitTime
 			})
 
@@ -49,7 +49,7 @@ export default {
 	},
 	methods: {
 		closeWindow() {
-			this.$router.go(-1)
+			this.$store.commit('closeReviewList')
 		},
 		submitTime(t) {
 			return moment(t).calendar()
@@ -103,6 +103,7 @@ export default {
 	background-color: white;
 	position: relative;
 	width: 430px;
+	z-index: 6;
 	@media (max-width: 429px) {
 		border-radius: 0;
 		box-shadow: none;
@@ -144,7 +145,7 @@ export default {
 			width: 15px;
 			height: 15px;
 			&::before {
-				background: url(../assets/cancel-black.svg);
+				background: url(../assets/close-button.svg);
 				background-size: 15px;
 				content: '';
 				position: absolute;

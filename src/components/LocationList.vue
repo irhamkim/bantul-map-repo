@@ -15,9 +15,9 @@
 							</div>
 							<div class="location-list__details">
 								<div class="location-list__name"
-									@click="openInfoWindow(location['.key'])">{{ location.name }}</div>
+									@click="openLocationDetail(location['.key'])">{{ location.name }}</div>
 								<div class="location-list__category"
-									@click="openCategories(location.category.key)">{{ location.category.name }}</div>
+									@click="openLocationByCategory(location.category.key)">{{ location.category.name }}</div>
 								<div class="location-list__address">{{ location.address }}</div>
 							</div>
 						</div>
@@ -46,13 +46,13 @@ export default {
 	},
 	methods: {
 		closeWindow() {
-			this.$router.go(-1)
+			this.$store.commit('closeWindow')
 		},
-		openInfoWindow(k) {
-			this.$router.push({ query: { window: 'infoWindow', key: k } })
+		openLocationDetail(k) {
+			this.$router.push({ query: { location: k } })
 		},
-		openCategories(k) {
-			this.$router.push({ query: { window: 'locationbc', key: k } })
+		openLocationByCategory(k) {
+			this.$router.push({ query: { category: k } })
 		}
 	}
 }
@@ -79,7 +79,7 @@ export default {
 	position: absolute !important;
 	width: 430px;
 	height: 100vh;
-	z-index: 5;
+	z-index: 3;
 	@media (max-width : 429px) {
 		width: 100%;
 	}
@@ -142,7 +142,7 @@ export default {
 			width: 15px;
 			height: 15px;
 			&::before {
-				background: url(../assets/cancel-black.svg);
+				background: url(../assets/close-button.svg);
 				background-size: 15px;
 				content: '';
 				position: absolute;

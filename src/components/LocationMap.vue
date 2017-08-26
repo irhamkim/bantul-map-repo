@@ -2,19 +2,20 @@
 	<div class="map">
 		<omnibox>
 		</omnibox>
-		<info-window v-if="currentActiveWindow === 'infoWindow'"
+		<location-detail v-if="this.$store.state.locationDetailIsActive"
 			@get-direction="getDirection">
-		</info-window>
-		<search-result v-if="currentActiveWindow === 'searchResult'">
+		</location-detail>
+		<search-result v-if="this.$store.state.searchResultIsActive">
 		</search-result>
-		<user-menu v-if="currentActiveWindow === 'userMenu'">
+		<user-menu v-if="activeWindow('userMenu')">
 		</user-menu>
-		<omniform v-if="currentActiveForm"></omniform>
-		<category-list v-if="currentActiveWindow === 'categoryList'"></category-list>
-		<location-list v-if="currentActiveWindow === 'locationList'">
+		<omniform v-if="this.$store.state.activeForm"></omniform>
+		<category-list v-if="activeWindow('categoryList')"></category-list>
+		<bookmark-list v-if="activeWindow('bookmarkList')"></bookmark-list>
+		<location-list v-if="activeWindow('locationList')">
 		</location-list>
-		<location-by-category v-if="currentActiveWindow === 'locationbc'"></location-by-category>
-		<review-list v-if="currentActiveWindow === 'reviewList'">
+		<location-by-category v-if="activeWindow('locationByCategory')"></location-by-category>
+		<review-list v-if="this.$store.state.reviewListIsActive">
 		</review-list>
 		<transition name="fade" mode="out-in">
 			<div v-if="popUpMessageOpen" class="map__popup-message">
@@ -57,7 +58,7 @@
 				@click="panTo(currentPosition)"></gmap-marker>
 			<gmap-marker v-for="(location, index) in locations" :location="location" :key="index"
 				:position="location.position"
-				@click="openInfoWindow(location['.key']), panTo(location.position)"></gmap-marker>
+				@click="openLocationDetail(location['.key']), panTo(location.position)"></gmap-marker>
 		</gmap-map>
 	</div>
 </template>
@@ -68,10 +69,11 @@ import Omniform from './Omniform'
 import SearchResult from './SearchResult'
 import UserMenu from './UserMenu'
 import CategoryList from './CategoryList'
+import BookmarkList from './BookmarkList'
 import LocationList from './LocationList'
 import LocationByCategory from './LocationByCategory'
 import ReviewList from './ReviewList'
-import InfoWindow from './InfoWindow'
+import LocationDetail from './LocationDetail'
 import Vue from 'vue'
 import * as VueGoogleMaps from 'vue2-google-maps'
 import firebase from '../firebaseConfig'
@@ -93,6 +95,7 @@ export default {
 						lat: position.lat,
 						lng: position.lng
 					}
+					this.$store.commit('openLocationDetail')
 				}
 			})
 		}
@@ -108,7 +111,6 @@ export default {
 				})
 			}
 		})
-		this.handleRoute(this.$route.query);
 	},
 	data() {
 		return {
@@ -129,17 +131,16 @@ export default {
 			currentPosition: null,
 			isLoading: false,
 			errorMessage: null,
-			currentActiveWindow: null,
-			currentActiveForm: null,
 		}
 	},
 	components: {
 		Omnibox,
 		Omniform: () => import('./Omniform'),
-		InfoWindow: () => import('./InfoWindow'),
+		LocationDetail: () => import('./LocationDetail'),
 		SearchResult: () => import('./SearchResult'),
 		UserMenu: () => import('./UserMenu'),
 		CategoryList: () => import('./CategoryList'),
+		BookmarkList: () => import('./BookmarkList'),
 		LocationList: () => import('./LocationList'),
 		LocationByCategory: () => import('./LocationByCategory'),
 		ReviewList: () => import('./ReviewList'),
@@ -151,21 +152,41 @@ export default {
 	},
 	watch: {
 		'$route' (to, from) {
-			this.handleRoute(to.query)
+			if (to.query.location) {
+				firebase.database().ref('locations').once('value', (snapshot) => {
+					if (snapshot.hasChild(to.query.location)) {
+						let position = snapshot.child(to.query.location).child('position').val()
+						this.initialCenter = {
+							lat: position.lat,
+							lng: position.lng
+						}
+						this.$store.commit('openLocationDetail')
+					}
+				})
+
+			}
+
+			if (to.query.category) {
+				firebase.database().ref('categories').once('value', (snapshot) => {
+					if (snapshot.hasChild(to.query.category)) {
+						this.$store.commit('openWindow', 'locationByCategory')		
+					}
+				})
+
+			}
+
+			if (from.query.location && !to.query.location){
+				this.$store.commit('closeLocationDetail')
+			}
+
+			if (from.query.category && !to.query.category) {
+				this.$store.commit('closeWindow')
+			}
 		}
 	},
 	methods: {
-		handleRoute(q) {
-			if (q.window) {
-				this.currentActiveWindow = q.window
-			} else {
-				this.currentActiveWindow = null
-			}
-			if (q.form) {
-				this.currentActiveForm = q.form
-			} else {
-				this.currentActiveForm = null
-			}
+		activeWindow(s) {
+			return this.$store.state.activeWindow === s ? true : false
 		},
 		allowGeolocation() {
 			this.errorMessage = null
@@ -222,7 +243,7 @@ export default {
 			if (this.currentPosition) {
 				this.popUpMessageOpen = true
 				this.isLoading = true
-				this.$store.commit('closeInfoWindow')
+				this.$store.commit('closeLocationDetail')
 
 				var directionsService = new google.maps.DirectionsService
 				var directionsDisplay = new google.maps.DirectionsRenderer
@@ -241,6 +262,7 @@ export default {
 						travelMode: 'DRIVING'
 					}, (response, status) => {
 						if (status === 'OK') {
+							that.$router.push('')
 							directionsDisplay.setDirections(response)
 							that.popUpMessageOpen = false
 						} else {
@@ -254,9 +276,11 @@ export default {
 			} else {
 				this.popUpMessageOpen = true
 			}
+			this.$store.commit('closeWindow')
+			this.$router.push('')
 		},
-		openInfoWindow(key) {
-			this.$router.push({ query: { window: 'infoWindow', key: key } })
+		openLocationDetail(key) {
+			this.$router.push({ query: { location: key } })
 		},
 	}
 }
@@ -309,7 +333,7 @@ export default {
 		@include center();
 		width: 300px;
 		height: 210px;
-		z-index: 4;
+		z-index: 99;
 		&__head {
 			@include font-default(black, 17px);
 		}

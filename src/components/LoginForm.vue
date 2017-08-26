@@ -62,26 +62,29 @@
 				this.loading = true;
 				
 				firebase.auth().signInWithEmailAndPassword(this.emailForm, this.passwordForm).then(() => {
-					this.$store.commit('closeForm')
+					this.$router.go(-1)
 				}).catch((error) => {
 					this.errorMessage = errorMessageHandler(error.code)
-					this.loading = false;
+					this.loading = false
 				});
 			} else {
 				this.errorMessage = 'Email and password can\'t be empty';
 			}
 		},
 		logInUserWithProvider: function(provider) {
+			var authProvider = null
 			if (provider == 'google') {
-				var authProvider = new firebase.auth.GoogleAuthProvider();
-				this.loading = true;
-				firebase.auth().signInWithRedirect(authProvider);
+				authProvider = new firebase.auth.GoogleAuthProvider();
 			} else if (provider == 'facebook') {
-				var authProvider = new firebase.auth.FacebookAuthProvider();
-				this.loading = true;
-				firebase.auth().signInWithRedirect(authProvider);
+				authProvider = new firebase.auth.FacebookAuthProvider();
 			} else if (provider == 'email') {
 				this.logInUserWithEmail();
+			}
+
+			if (authProvider !== 'email') {
+				this.loading = true
+				firebase.auth().signInWithRedirect(authProvider)
+
 			}
 		},
 		closeLoginForm() {
@@ -113,6 +116,7 @@
 	left: 50%;
 	transform: translate(-50%, -50%);
 }
+/*****/
 
 .login-form {
 	width: 100%;

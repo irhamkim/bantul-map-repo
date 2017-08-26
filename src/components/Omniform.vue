@@ -3,17 +3,12 @@
 		<div v-if="loading" class="auth__loader"></div>
 		<button class="omniform__flat-button omniform__flat-button--close"
 			@click="closeForm"></button>
-		<transition name="fade">
-			<login-form v-if="openForm === 'loginForm'"></login-form>
-		</transition>
-		<transition name="fade">
-			<forgot-password v-if="openForm === 'forgotPasswordForm'"></forgot-password>
-		</transition>
-		<transition name="fade">
-			<register-form v-if="openForm === 'registerForm'"></register-form>
-		</transition>
-		<transition name="fade">
-			<review-form v-if="openForm === 'reviewForm'"></review-form>
+		<transition name="fade" mode="out-in">
+			<login-form v-if="openForm('loginForm')" key="1"></login-form>
+			<forgot-password v-if="openForm('forgotPasswordForm')" key="2"></forgot-password>
+			<register-form v-if="openForm('registerForm')" key="3"></register-form>
+			<review-form v-if="openForm('reviewForm')" key="4"></review-form>
+			<social-share-form v-if="openForm('socialShareForm')"></social-share-form>
 		</transition>
 	</div>
 </template>
@@ -23,6 +18,7 @@ import LoginForm from './LoginForm'
 import ForgotPasswordForm from './ForgotPassword'
 import RegisterForm from './RegisterForm'
 import ReviewForm from './ReviewForm'
+import SocialShareForm from './SocialShareForm'
 import firebase from '../firebaseConfig'
 
 export default {
@@ -39,20 +35,19 @@ export default {
 			}
 		})
 	},
-	computed: {
-		openForm() {
-			return this.$route.query.form
-		},
-	},
 	components: {
 		LoginForm: () => import('./LoginForm'),
 		ForgotPassword: () => import('./ForgotPassword'),
 		RegisterForm: () => import('./RegisterForm'),
 		ReviewForm: () => import('./ReviewForm'),
+		SocialShareForm: () => import('./SocialShareForm'),
 	},
 	methods: {
+		openForm(state) {
+			return this.$store.state.activeForm === state ? true : false
+		},
 		closeForm() {
-			this.$router.go(-1)
+			this.$store.commit('closeForm')
 		}
 	}
 }
@@ -85,8 +80,8 @@ export default {
 	transform: translate(-50%, -50%);
 	width: 500px;
 	height: 400px;
-	z-index: 5;
-	@media (max-width: 429px) {
+	z-index: 6;
+	@media (max-width: 499px) {
 		border-radius: 0;
 		box-shadow: none;
 		width: 100%;
@@ -120,7 +115,7 @@ export default {
 			width: 15px;
 			height: 15px;
 			&::before {
-				background: url(../assets/cancel-black.svg);
+				background: url(../assets/close-button.svg);
 				background-size: 15px;
 				content: '';
 				position: absolute;
