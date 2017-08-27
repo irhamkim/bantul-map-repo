@@ -1,9 +1,13 @@
 <template>
 	<div class="social-share-form">
 		<div class="social-share-form__button-container">
-			<button class="social-share-form__button--facebook"
-				@click="shareToFb">Facebook</button>
-		</div>
+			<button class="social-share-form__button social-share-form__button--facebook"
+				@click="shareToFb">
+			</button>
+			<a :href="tweetHref">
+				<button class="social-share-form__button social-share-form__button--twitter"></button>
+			</a>
+		</div>	
 	</div>
 </template>
 
@@ -13,25 +17,6 @@ import firebase from '../firebaseConfig'
 
 export default {
 	name: 'socialShareForm',
-	beforeMount() {
-		//FB init
-		FB.init({
-		    appId            : '240139593061293',
-		    autoLogAppEvents : true,
-		    xfbml            : true,
-		    version          : 'v2.10'
-		});
-		FB.AppEvents.logPageView();
-
-		(function(d, s, id){
-		    var js, fjs = d.getElementsByTagName(s)[0];
-		    if (d.getElementById(id)) {return;}
-		    js = d.createElement(s); js.id = id;
-		    js.src = "//connect.facebook.net/en_US/sdk.js";
-		    fjs.parentNode.insertBefore(js, fjs);
-		}(document, 'script', 'facebook-jssdk'));
-		/***/
-	},
 	data() {
 		return {
 			buttonStyle: {
@@ -50,6 +35,9 @@ export default {
 		}
 	},
 	computed: {
+		tweetHref() {
+			return "https://twitter.com/intent/tweet?text=" + this.title + "&hashtags=" + this.hashtags
+		},
 		title() {
 			return "A " + this.location.category.name + " center in Bantul"
 		},
@@ -97,21 +85,46 @@ export default {
 	transform: translate(-50%, -50%);
 	width: 350px;
 	height: 220px;
+	&__button-container {
+		box-sizing: border-box;
+		display: flex;
+		justify-content: center;
+		margin-top: 10px;
+		position: absolute;
+		left: 50%;
+		transform: translate(-50%, 0);
+		width: 300px;
+	}
 	&__button {
+		background-color: white;
+		border: 1px solid rgba(114, 114, 114, 0.7);
 		border-radius: 50%;
+		flex: 0 0 100px;
 		width: 100px;
+		max-width: 100px;
 		height: 100px;
-
+		&:focus {
+			outline-style: none;
+		}
+		&--twitter {
+			&::before {
+				content: 'Twitter';
+				font-size: 9px;
+				text-align: center;
+			}
+		}
+		&--facebook {
+			&::before {
+				content: 'Facebook';
+				font-size: 9px;
+				text-align: center;
+				
+			}
+		}
+		&:focus {
+			outline-style: none;
+		}
 	}
 }
 
-.social-share-form__button {
-	border-radius: 50%;
-		width: 100px;
-		height: 100px;
-}
-
-.x {
-	background-color: black;
-}
 </style>

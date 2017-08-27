@@ -9,7 +9,49 @@
 <script>
 
 export default {
-  name: 'app'
+  name: 'app',
+  created() {
+    //FB init
+    window.fbAsyncInit = function() {
+      FB.init({
+          appId            : '240139593061293',
+          autoLogAppEvents : true,
+          xfbml            : true,
+          version          : 'v2.10'
+      });
+      FB.AppEvents.logPageView()
+    }
+    /***/
+  },
+  beforeMount() {
+    //Async load fb sdk
+    (function(d, s, id){
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {return;}
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+    /****/
+
+    //Async load twitter sdk
+    window.twttr = (function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[1],
+        t = window.twttr || {};
+      if (d.getElementById(id)) return t;
+      js = d.createElement(s);
+      js.id = id;
+      js.src = "https://platform.twitter.com/widgets.js";
+      fjs.parentNode.insertBefore(js, fjs);
+
+      t._e = [];
+      t.ready = function(f) {
+        t._e.push(f);
+      };
+
+      return t;
+    }(document, "script", "twitter-wjs"))
+  },
 }
 </script>
 
