@@ -36,6 +36,8 @@
 						@click="logInUserWithProvider('google')"></button>
 					<button class="login-form__circle-button login-form__circle-button--facebook"
 						@click="logInUserWithProvider('facebook')"></button>
+					<button class="login-form__circle-button login-form__circle-button--twitter"
+						@click="logInUserWithProvider('twitter')"></button>
 				</div>
 			</div>
 		</transition>
@@ -73,12 +75,18 @@
 		},
 		logInUserWithProvider: function(provider) {
 			var authProvider = null
-			if (provider == 'google') {
-				authProvider = new firebase.auth.GoogleAuthProvider();
-			} else if (provider == 'facebook') {
-				authProvider = new firebase.auth.FacebookAuthProvider();
-			} else if (provider == 'email') {
-				this.logInUserWithEmail();
+			switch (provider) {
+				case 'google':
+					authProvider = new firebase.auth.GoogleAuthProvider()
+					break
+				case 'facebook':
+					authProvider = new firebase.auth.FacebookAuthProvider()
+					break
+				case 'twitter':
+					authProvider = new firebase.auth.TwitterAuthProvider()
+					break
+				default:
+				this.logInUserWithEmail()
 			}
 
 			if (authProvider !== 'email') {
@@ -235,9 +243,9 @@
 	}
 	&__circle-button {
 		background-color: white;
-		border: 1px solid #00b27c;
-		border-radius: 50%;
+		border: none;
 		flex: 0 0 70px;
+		position: relative;
 		width: 70px;
 		max-width: 70px;
 		height: 70px;
@@ -246,17 +254,32 @@
 		}
 		&--google {
 			&::before {
-				content: 'Google';
-				font-size: 9px;
-				text-align: center;
+				background: url('../assets/google-plus.svg');
+				background-size: 50px;
+				content: '';
+				@include center();
+				width: 50px;
+				height: 50px;
 			}
 		}
 		&--facebook {
 			&::before {
-				content: 'Facebook';
-				font-size: 9px;
-				text-align: center;
-				
+				background: url('../assets/facebook.svg');
+				background-size: 50px;
+				content: '';
+				@include center();
+				width: 50px;
+				height: 50px;
+			}
+		}
+		&--twitter {
+			&::before {
+				background: url('../assets/twitter.svg');
+				background-size: 50px;
+				content: '';
+				@include center();
+				width: 50px;
+				height: 50px;
 			}
 		}
 	}

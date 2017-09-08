@@ -1,6 +1,11 @@
 <template>
 	<div class="social-share-form">
+		<span class="social-share-form__header">Share to</span>
 		<div class="social-share-form__button-container">
+			<a :href="gplusHref"
+				onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;">
+				<button class="social-share-form__button social-share-form__button--google-plus"></button>
+			</a>
 			<button class="social-share-form__button social-share-form__button--facebook"
 				@click="shareToFb">
 			</button>
@@ -17,15 +22,6 @@ import firebase from '../firebaseConfig'
 
 export default {
 	name: 'socialShareForm',
-	data() {
-		return {
-			buttonStyle: {
-				'border-radius': '50%',
-				width: '100px',
-				height: '100px',
-			}
-		}
-	},
 	firebase() {
 		return {
 			location: {
@@ -35,17 +31,20 @@ export default {
 		}
 	},
 	computed: {
+		gplusHref() {
+			return 'https://plus.google.com/share?url=' + window.location.href
+		},
 		tweetHref() {
-			return "https://twitter.com/intent/tweet?text=" + this.title + "&hashtags=" + this.hashtags
+			return 'https://twitter.com/intent/tweet?text=' + this.title + ' ' + window.location.href + ' ' + '&hashtags=' + this.hashtags
 		},
 		title() {
-			return "A " + this.location.category.name + " center in Bantul"
+			return 'A ' + this.location.category.name + ' center in Bantul'
 		},
 		description() {
-			return "A " + this.location.category.name + " center in Bantul"
+			return 'A ' + this.location.category.name + 'center in Bantul'
 		},
 		hashtags() {
-			return this.location.name.replace(/ /g, "") + ", " + this.location.category.name + ", Bantul"
+			return this.location.name.replace(/ /g, "") + ', ' + this.location.category.name + ', Bantul'
 		}
 	},
 	methods: {
@@ -76,6 +75,13 @@ export default {
 	font-size: $size;
 	font-weight: $weight;
 }
+@mixin center() {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+/***/
 
 .social-share-form {
 	display: flex;
@@ -89,41 +95,62 @@ export default {
 		box-sizing: border-box;
 		display: flex;
 		justify-content: center;
-		margin-top: 10px;
 		position: absolute;
 		left: 50%;
-		transform: translate(-50%, 0);
-		width: 300px;
+		transform: translate(-50%, 50%);
+		width: 100%;
 	}
 	&__button {
 		background-color: white;
-		border: 1px solid rgba(114, 114, 114, 0.7);
-		border-radius: 50%;
-		flex: 0 0 100px;
-		width: 100px;
-		max-width: 100px;
-		height: 100px;
+		border: none;
+		flex: 0 0 70px;
+		position: relative;
+		width: 70px;
+		max-width: 70px;
+		height: 70px;
 		&:focus {
 			outline-style: none;
 		}
-		&--twitter {
+		&--google-plus {
 			&::before {
-				content: 'Twitter';
-				font-size: 9px;
-				text-align: center;
+				background: url('../assets/google-plus.svg');
+				background-size: 50px;
+				content: '';
+				@include center();
+				width: 50px;
+				height: 50px;
 			}
 		}
 		&--facebook {
 			&::before {
-				content: 'Facebook';
-				font-size: 9px;
-				text-align: center;
-				
+				background: url('../assets/facebook.svg');
+				background-size: 50px;
+				content: '';
+				@include center();
+				width: 50px;
+				height: 50px;
+			}
+		}
+		&--twitter {
+			&::before {
+				background: url('../assets/twitter.svg');
+				background-size: 50px;
+				content: '';
+				@include center();
+				width: 50px;
+				height: 50px;
 			}
 		}
 		&:focus {
 			outline-style: none;
 		}
+	}
+	&__header {
+		@include font-default(black, 19px, 400);
+		justify-content: center;
+		position: absolute;
+		left: 50%;
+		transform: translate(-50%, 50%);
 	}
 }
 

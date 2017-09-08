@@ -89,7 +89,7 @@ export default {
 	left: 5px;
 	width: 420px;
 	height: 40px;
-	z-index: 3;
+	z-index: 5;
 	@media (max-width : 429px) {
 		width: calc(100% - 10px);
 	}

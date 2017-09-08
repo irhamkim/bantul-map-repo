@@ -158,7 +158,7 @@ export default {
 	left: 0;
 	width: 430px;
 	min-height: 100vh;
-	z-index: 2;
+	z-index: 4;
 	&__ribbon {
 		width: 100%;
 		height: 50px;

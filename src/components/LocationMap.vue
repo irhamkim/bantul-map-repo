@@ -14,7 +14,8 @@
 		<bookmark-list v-if="activeWindow('bookmarkList')"></bookmark-list>
 		<location-list v-if="activeWindow('locationList')">
 		</location-list>
-		<location-by-category v-if="activeWindow('locationByCategory')"></location-by-category>
+		<closest-location v-if="activeWindow('closestLocation')"></closest-location>
+		<location-by-category v-if="locationByCategoryIsActive"></location-by-category>
 		<review-list v-if="this.$store.state.reviewListIsActive">
 		</review-list>
 		<transition name="fade" mode="out-in">
@@ -71,6 +72,7 @@ import UserMenu from './UserMenu'
 import CategoryList from './CategoryList'
 import BookmarkList from './BookmarkList'
 import LocationList from './LocationList'
+import ClosestLocation from './ClosestLocation'
 import LocationByCategory from './LocationByCategory'
 import ReviewList from './ReviewList'
 import LocationDetail from './LocationDetail'
@@ -96,6 +98,12 @@ export default {
 						lng: position.lng
 					}
 					this.$store.commit('openLocationDetail')
+				}
+			})
+
+			firebase.database().ref('categories').on('value', (snapshot) => {
+				if (snapshot.hasChild(this.$route.query.category)) {
+					this.$store.commit('openWindow', 'locationByCategory')
 				}
 			})
 		}
@@ -142,6 +150,7 @@ export default {
 		CategoryList: () => import('./CategoryList'),
 		BookmarkList: () => import('./BookmarkList'),
 		LocationList: () => import('./LocationList'),
+		ClosestLocation: () => import('./ClosestLocation'),
 		LocationByCategory: () => import('./LocationByCategory'),
 		ReviewList: () => import('./ReviewList'),
 	},
@@ -149,6 +158,11 @@ export default {
 		return {
 			locations: firebase.database().ref('locations')
 		}
+	},
+	computed: {
+		locationByCategoryIsActive() {
+			return this.activeWindow('locationByCategory') && this.$route.query.category ? true : false
+		},
 	},
 	watch: {
 		'$route' (to, from) {

@@ -5,6 +5,8 @@
 		</div>
 		<button class="user-menu__button user-menu__button--locations"
 			@click="openWindow('locationList')"></button>
+		<button class="user-menu__button user-menu__button--closest"
+			@click="openWindow('closestLocation')"></button>
 		<button class="user-menu__button user-menu__button--categories"
 			@click="openWindow('categoryList')"></button>
 		<template v-if="!isLoggedIn">
@@ -123,6 +125,18 @@ export default {
 			}
 			&::after {
 				content: 'Categories';
+				@include font-default(black, 15px);
+				@include button-text;
+			}
+		}
+		&--closest {
+			&::before {
+				background-image: url('../assets/closest-location.svg');
+				content: '';
+				@include button-icon;
+			}
+			&::after {
+				content: 'Closest Locations';
 				@include font-default(black, 15px);
 				@include button-text;
 			}
