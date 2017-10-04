@@ -2,27 +2,31 @@
 	<div class="wrapper">
 		<div clas="bookmark-list">
 			<div class="bookmark-list__header">
-				<button class="bookmark-list__flat-button bookmark-list__flat-button--close"
-				@click="closeWindow"></button>
 			</div>
 			<div v-bar="{ el1Class: 'el1', el2Class: 'bookmark-list__item-wrapper' }">
 				<div>
 					<div>
-						<div v-for="(location, index) in locations" :key="index"
-							class="bookmark-list__item">
-							<div class="bookmark-list__img-container">
-								<img src="" :alt="location['.key']">
-							</div>
-							<div class="bookmark-list__details">
-								<div class="bookmark-list__name"
-									@click="openLocationDetail(location['.key'])">
-									{{ location.name }}
+						<h2 class="bookmark-list__title">Bookmarks</h2>
+						<template v-if="haveBookmarked">
+							<div v-for="(location, index) in locations" :key="index"
+								class="bookmark-list__item">
+								<div class="bookmark-list__img-container">
+									<img src="" :alt="location['.key']">
 								</div>
-								<div class="bookmark-list__category"
-									@click="openLocationByCategory(location.category.key)">{{ location.category.name }}</div>
-								<div class="bookmark-list__address">{{ location.address }}</div>
+								<div class="bookmark-list__details">
+									<div class="bookmark-list__name"
+										@click="openLocationDetail(location['.key'])">
+										{{ location.name }}
+									</div>
+									<div class="bookmark-list__category"
+										@click="openLocationByCategory(location.category.key)">{{ location.category.name }}</div>
+									<div class="bookmark-list__address">{{ location.address }}</div>
+								</div>
 							</div>
-						</div>
+						</template>
+						<template v-else>
+							<div class="bookmark-list__msg">You haven't bookmarked any item yet.</div>
+						</template>
 					</div>
 				</div>
 			</div>
@@ -42,6 +46,12 @@ export default {
 	firebase() {
 		return {
 			locations: firebase.database().ref('users').child(this.$store.state.user.uid).child('bookmarks')
+		}
+	},
+	computed: {
+		haveBookmarked() {
+			return this.locations.length > 1 ? true : false 
+			//Object.keys(this.locations[0]).length === 0 && this.locations[0].constructor === Object 
 		}
 	},
 	methods: {
@@ -101,6 +111,7 @@ export default {
 	background-color: white;
 	position: relative;
 	width: 430px;
+	height: 100%;
 	@media (max-width: 429px) {
 		border-radius: 0;
 		box-shadow: none;
@@ -119,38 +130,15 @@ export default {
 		height: 50px;
 		top: 0;
 		z-index: 1;
-		&::before {
-			content: 'Locations';
-			@include font-default(black, 17px, 400);
-			position: absolute;
-			top: 50%;
-			left: 10px;
-			transform: translateY(-50%);
-		}
 	}
-	&__flat-button {
-		background-color: white;
-		border: none;
-		&:focus {
-			outline-style: none;
-		}
-		&--close {
-			position: absolute;
-			top: 50%;
-			right: 20px;
-			transform: translateY(-50%);
-			width: 15px;
-			height: 15px;
-			&::before {
-				background: url(../assets/close-button.svg);
-				background-size: 15px;
-				content: '';
-				position: absolute;
-				@include center;
-				width: 15px;
-				height: 15px;
-			}
-		}
+	&__title {
+		@include font-default(black, 18px, 400);
+		position: relative;
+		left: 5px;
+	}
+	&__msg {
+		@include center();
+		@include font-default(black, 17px, 400);
 	}
 	&__item {
 		box-sizing: border-box;

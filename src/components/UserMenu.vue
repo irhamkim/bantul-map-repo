@@ -41,7 +41,12 @@ export default {
 			this.$store.commit('openForm', 'loginForm')
 		},
 		openWindow(n) {
-			this.$store.commit('openWindow', n)
+			if (n === 'closestLocation') {
+			 	this.$emit('openClosestLocation')
+			 } else {
+			 	this.$store.commit('openWindow', n)
+			 } 
+			
 		},
 		logOutUser() {
 			firebase.auth().signOut().then(() => {

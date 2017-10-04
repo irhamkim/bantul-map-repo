@@ -61,6 +61,7 @@ export default {
 		},
 		closeWindow() {
 			this.$store.commit('closeWindow')
+			this.$router.push('')
 		},
 	}
 

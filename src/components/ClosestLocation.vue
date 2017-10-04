@@ -1,34 +1,34 @@
 <template>
 <div class="wrapper">
-		<div class="closest-location">
-			<div class="closest-location__header">
-				<button class="closest-location__flat-button closest-location__flat-button--close"
-				@click="closeWindow"></button>
-			</div>
-			<div v-bar="{ el1Class: 'el1', el2Class: 'closest-location__item-wrapper' }">
+	<div class="closest-location">
+		<div class="closest-location__header">
+			<button class="closest-location__flat-button closest-location__flat-button--close"
+			@click="closeWindow"></button>
+		</div>
+		<div v-bar="{ el1Class: 'el1', el2Class: 'closest-location__item-wrapper' }">
+			<div>
 				<div>
-					<div>
-						<div :key="-1" class="closest-location__item">
-							<div class="closest-location__img-container">
-								<img src="" alt="">
-							</div>
-							<div class="closest-location__details">
-								<div class="closest-location__name"
-									@click="openclosestLocationByCategory('*')">
-									All categories 
-								</div>
+					<h2 class="closest-location__title">Closest Location</h2>
+					<div :key="-1" class="closest-location__item">
+						<div class="closest-location__img-container">
+							<img src="" alt="">
+						</div>
+						<div class="closest-location__details">
+							<div class="closest-location__name"
+								@click="openClosestLocationByCategory('*')">
+								All categories 
 							</div>
 						</div>
-						<div v-for="(category, index) in categories" :key="index"
-							class="closest-location__item">
-							<div class="closest-location__img-container">
-								<img src="" :alt="category['.key']">
-							</div>
-							<div class="closest-location__details">
-								<div class="closest-location__name"
-									@click="openClosestLocationByCategory(category['.key'])">
-									{{ category.name }}
-								</div>
+					</div>
+					<div v-for="(category, index) in categories" :key="index"
+						class="closest-location__item">
+						<div class="closest-location__img-container">
+							<img src="" :alt="category['.key']">
+						</div>
+						<div class="closest-location__details">
+							<div class="closest-location__name"
+								@click="openClosestLocationByCategory(category['.key'])">
+								{{ category.name }}
 							</div>
 						</div>
 					</div>
@@ -36,6 +36,7 @@
 			</div>
 		</div>
 	</div>
+</div>
 </template>
 
 <script>
@@ -52,10 +53,13 @@ export default {
 	},
 	methods: {
 		openClosestLocationByCategory(key) {
-			this.$store.commit('openClosestLocationByCategory')
+			this.$store.commit('openClosestLocationByCategory', key)
+			this.$nextTick(()=> {
+				this.$store.commit('openWindow', 'closestLocationByCategory')
+			})
 		},
 		closeWindow() {
-
+			this.$store.commit('closeWindow')
 		}
 	}
 }
@@ -104,6 +108,7 @@ export default {
 	background-color: white;
 	position: relative;
 	width: 430px;
+	height: 100%;
 	@media (max-width: 429px) {
 		border-radius: 0;
 		box-shadow: none;
@@ -122,14 +127,11 @@ export default {
 		height: 50px;
 		top: 0;
 		z-index: 1;
-		&::before {
-			content: 'Locations';
-			@include font-default(black, 17px, 400);
-			position: absolute;
-			top: 50%;
-			left: 10px;
-			transform: translateY(-50%);
-		}
+	}
+	&__title {
+		@include font-default(black, 18px, 400);
+		position: relative;
+		left: 5px;
 	}
 	&__flat-button {
 		background-color: white;

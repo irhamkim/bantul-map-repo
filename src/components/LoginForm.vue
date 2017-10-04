@@ -89,11 +89,12 @@
 				this.logInUserWithEmail()
 			}
 
-			if (authProvider !== 'email') {
+			
+			if (provider !== 'email') {
 				this.loading = true
 				firebase.auth().signInWithRedirect(authProvider)
-
 			}
+			
 		},
 		closeLoginForm() {
 			this.$store.commit('closeForm')

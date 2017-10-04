@@ -2,12 +2,11 @@
 	<div class="wrapper">
 		<div clas="location-list">
 			<div class="location-list__header">
-				<button class="location-list__flat-button location-list__flat-button--close"
-				@click="closeWindow"></button>
 			</div>
 			<div v-bar="{ el1Class: 'el1', el2Class: 'location-list__item-wrapper' }">
 				<div>
 					<div>
+						<h2 class="location-list__title">Locations</h2>
 						<div v-for="(location, index) in locations" :key="index"
 							class="location-list__item">
 							<div class="location-list__img-container">
@@ -101,6 +100,7 @@ export default {
 	background-color: white;
 	position: relative;
 	width: 430px;
+	height: 100%;
 	@media (max-width: 429px) {
 		border-radius: 0;
 		box-shadow: none;
@@ -119,38 +119,11 @@ export default {
 		height: 50px;
 		top: 0;
 		z-index: 1;
-		&::before {
-			content: 'Locations';
-			@include font-default(black, 17px, 400);
-			position: absolute;
-			top: 50%;
-			left: 10px;
-			transform: translateY(-50%);
-		}
 	}
-	&__flat-button {
-		background-color: white;
-		border: none;
-		&:focus {
-			outline-style: none;
-		}
-		&--close {
-			position: absolute;
-			top: 50%;
-			right: 20px;
-			transform: translateY(-50%);
-			width: 15px;
-			height: 15px;
-			&::before {
-				background: url(../assets/close-button.svg);
-				background-size: 15px;
-				content: '';
-				position: absolute;
-				@include center;
-				width: 15px;
-				height: 15px;
-			}
-		}
+	&__title {
+		@include font-default(black, 18px, 400);
+		position: relative;
+		left: 5px;
 	}
 	&__item {
 		box-sizing: border-box;

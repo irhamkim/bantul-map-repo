@@ -2,12 +2,11 @@
 	<div class="wrapper">
 		<div clas="category-list">
 			<div class="category-list__header">
-				<button class="category-list__flat-button category-list__flat-button--close"
-				@click="closeWindow"></button>
 			</div>
 			<div v-bar="{ el1Class: 'el1', el2Class: 'category-list__item-wrapper' }">
 				<div>
 					<div>
+						<h2 class="category-list__title">Categories</h2>
 						<div v-for="(category, index) in categories" :key="index"
 							class="category-list__item">
 							<div class="category-list__img-container">
@@ -98,6 +97,7 @@ export default {
 	background-color: white;
 	position: relative;
 	width: 430px;
+	height: 100%;
 	@media (max-width: 429px) {
 		border-radius: 0;
 		box-shadow: none;
@@ -125,29 +125,10 @@ export default {
 			transform: translateY(-50%);
 		}
 	}
-	&__flat-button {
-		background-color: white;
-		border: none;
-		&:focus {
-			outline-style: none;
-		}
-		&--close {
-			position: absolute;
-			top: 50%;
-			right: 20px;
-			transform: translateY(-50%);
-			width: 15px;
-			height: 15px;
-			&::before {
-				background: url(../assets/close-button.svg);
-				background-size: 15px;
-				content: '';
-				position: absolute;
-				@include center;
-				width: 15px;
-				height: 15px;
-			}
-		}
+	&__title {
+		@include font-default(black, 18px, 400);
+		position: relative;
+		left: 5px;
 	}
 	&__item {
 		box-sizing: border-box;

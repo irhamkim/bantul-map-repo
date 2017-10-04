@@ -7,7 +7,7 @@
 		</location-detail>
 		<search-result v-if="this.$store.state.searchResultIsActive">
 		</search-result>
-		<user-menu v-if="activeWindow('userMenu')">
+		<user-menu v-if="activeWindow('userMenu')" @openClosestLocation="openClosestLocation">
 		</user-menu>
 		<omniform v-if="this.$store.state.activeForm"></omniform>
 		<category-list v-if="activeWindow('categoryList')"></category-list>
@@ -15,6 +15,7 @@
 		<location-list v-if="activeWindow('locationList')">
 		</location-list>
 		<closest-location v-if="activeWindow('closestLocation')"></closest-location>
+		<closest-location-by-category :currentPosition="currentPosition" v-if="activeWindow('closestLocationByCategory')"></closest-location-by-category>
 		<location-by-category v-if="locationByCategoryIsActive"></location-by-category>
 		<review-list v-if="this.$store.state.reviewListIsActive">
 		</review-list>
@@ -73,6 +74,7 @@ import CategoryList from './CategoryList'
 import BookmarkList from './BookmarkList'
 import LocationList from './LocationList'
 import ClosestLocation from './ClosestLocation'
+import ClosestLocationByCategory from './ClosestLocationByCategory'
 import LocationByCategory from './LocationByCategory'
 import ReviewList from './ReviewList'
 import LocationDetail from './LocationDetail'
@@ -151,6 +153,7 @@ export default {
 		BookmarkList: () => import('./BookmarkList'),
 		LocationList: () => import('./LocationList'),
 		ClosestLocation: () => import('./ClosestLocation'),
+		ClosestLocationByCategory: () => import('./ClosestLocationByCategory'),
 		LocationByCategory: () => import('./LocationByCategory'),
 		ReviewList: () => import('./ReviewList'),
 	},
@@ -296,6 +299,16 @@ export default {
 		openLocationDetail(key) {
 			this.$router.push({ query: { location: key } })
 		},
+		openClosestLocation() {
+			if (this.currentPosition) {
+				this.$store.commit('openWindow', 'closestLocation')
+			} else {
+				this.$store.commit('closeWindow')
+				this.$nextTick(()=> {
+					this.popUpMessageOpen = true
+				})
+			}
+		}
 	}
 }
 </script>

@@ -12,6 +12,7 @@ let store = new Vuex.Store({
 		locationDetailIsActive: false,
 		searchResultIsActive: false,
 		reviewListIsActive: false,
+		closestLocationCategory: null
 	},
 	mutations: {
 		setUserState(state, user) {
@@ -52,6 +53,9 @@ let store = new Vuex.Store({
 		},
 		closeReviewList(state) {
 			state.reviewListIsActive = false
+		},
+		openClosestLocationByCategory(state, payload) {
+			state.closestLocationCategory = payload
 		}
 	},
 	actions: {

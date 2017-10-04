@@ -2,12 +2,11 @@
 	<div class="wrapper">
 		<div clas="locationbc-list">
 			<div class="locationbc-list__header">
-				<button class="locationbc-list__flat-button locationbc-list__flat-button--close"
-				@click="closeWindow"></button>
 			</div>
 			<div v-bar="{ el1Class: 'el1', el2Class: 'locationbc-list__item-wrapper' }">
 				<div>
 					<div>
+						<h2 class="locationbc-list__title">{{ this.$route.query.category }} Locations</h2>
 						<div v-for="(location, index) in locations" :key="index"
 							class="locationbc-list__item">
 							<div class="locationbc-list__img-container">
@@ -18,6 +17,7 @@
 									@click="openLocationDetail(location['.key'])">
 									{{ location.name }}
 								</div>
+								<div class="locationbc-list__category">{{ name['.value'] }}</div>
 								<div class="locationbc-list__address">{{ location.address }}</div>
 							</div>
 						</div>
@@ -41,6 +41,10 @@ export default {
 		return {
 			locations: {
 				source: firebase.database().ref('categories').child(this.$route.query.category).child('locations')
+			},
+			name: {
+				source: firebase.database().ref('categories').child(this.$route.query.category).child('name'),
+				asObject: true
 			}
 		}
 	},
@@ -98,7 +102,7 @@ export default {
 	background-color: white;
 	position: relative;
 	width: 430px;
-	z-index: 4;
+	height: 100%;
 	@media (max-width: 429px) {
 		border-radius: 0;
 		box-shadow: none;
@@ -117,38 +121,11 @@ export default {
 		height: 50px;
 		top: 0;
 		z-index: 1;
-		&::before {
-			content: 'Locations';
-			@include font-default(black, 17px, 400);
-			position: absolute;
-			top: 50%;
-			left: 10px;
-			transform: translateY(-50%);
-		}
 	}
-	&__flat-button {
-		background-color: white;
-		border: none;
-		&:focus {
-			outline-style: none;
-		}
-		&--close {
-			position: absolute;
-			top: 50%;
-			right: 20px;
-			transform: translateY(-50%);
-			width: 15px;
-			height: 15px;
-			&::before {
-				background: url(../assets/close-button.svg);
-				background-size: 15px;
-				content: '';
-				position: absolute;
-				@include center;
-				width: 15px;
-				height: 15px;
-			}
-		}
+	&__title {
+		@include font-default(black, 18px, 400);
+		position: relative;
+		left: 5px;
 	}
 	&__item {
 		box-sizing: border-box;
@@ -173,6 +150,10 @@ export default {
 	&__name {
 		cursor: pointer;
 		@include font-default(#00b27c, 17px, 400);
+	}
+	&__category {
+		cursor: pointer;
+		@include font-default(#00b27c, 15px 100);
 	}
 	&__address {
 		@include font-default(black, 15px, 100);

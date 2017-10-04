@@ -52,7 +52,9 @@
 			</div>
 		</template>
 		<template v-else>
-			Not found :(
+			<div class="search-result__msg">
+				Not found :(
+			</div>
 		</template>
 	</div>
 </template>
@@ -169,6 +171,10 @@ export default {
 		@include font-default(black, 20px)
 		width: 100%;
 		padding: 5px 0;
+	}
+	&__msg {
+		@include center();
+		@include font-default(black, 17px, 400);
 	}
 	&__list-container {
 		box-sizing: border-box;
