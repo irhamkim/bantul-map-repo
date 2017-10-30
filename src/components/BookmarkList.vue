@@ -50,7 +50,7 @@ export default {
 	},
 	computed: {
 		haveBookmarked() {
-			return this.locations.length > 1 ? true : false 
+			return this.locations.length > 0 ? true : false 
 			//Object.keys(this.locations[0]).length === 0 && this.locations[0].constructor === Object 
 		}
 	},
